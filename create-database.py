@@ -10,7 +10,7 @@ config = {
 
 def create_database(cursor):
     try:
-        cursor.execute(file('chat.sql').read())
+        cursor.execute(open('chat.sql', 'r').read())
     except mysql.connector.Error as err:
         print("Failed creating database: {}".format(err))
         exit(1)

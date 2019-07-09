@@ -5,12 +5,15 @@ from flask import (
     render_template,
     request,
     session,
+    jsonify
 )
 
 import os
 import datetime
-from flask_socketio import SocketIO
-from flask_socketio import join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room, \
+close_room, rooms, disconnect
+
+import models.user as User
 
 
 app = Flask(__name__)
@@ -19,31 +22,63 @@ socketio = SocketIO(app)
 def messageReceived(methods=['GET', 'POST']):
     print('message was received!!!')
 
+@socketio.on('my event')
+def handle_my_custom_event(message):
+    emit('my_respone', {'data': message['data']})
+
 @socketio.on('join')
-def on_join(data):
-    username = data['username']
-    room = data['room']
-    join_room(room)
-    socketio.send(username + ' has entered the room.', room=room)
+def join(message):
+    print(message['room'])
+    join_room(message['room'])
+    emit('my_response', {
+        'data': 'In rooms: ' + ', '.join(rooms())
+    })
 
 @socketio.on('leave')
-def on_leave(data):
-    username = data['username']
-    room = data['room']
-    leave_room(room)
-    socketio.send(username + ' has left the room.', room=room)
+def leave(message):
+    leave_room(message['room'])
+    emit('my_response',{
+        'data': 'In rooms: ' + ', '.join(rooms())
+    })
 
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', 'POST']):
-    print('received my event: ' + str(json))
-    socketio.emit('my response', json, callback=messageReceived)
+@socketio.on('close_room')
+def close(message):
+    emit('my_response', {
+        'data': 'Room ' + message['room'] + ' is closing',
+    }, room=message['room'])
+    close_room(message['room'])
+
+@socketio.on('my_room_event')
+def send_room_message(message):
+    emit('my_response',{
+        'data': message['data'],
+        'room': message['room'],
+        'id': message['id']       
+    }, room=message['room'])
+
+# @socketio.on('disconnect_request')
+# def disconnect_request():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['user'] = request.form['user']
-        return redirect('/')
+        if 'user' in session:
+            return redirect('/')
+        else:
+            if User.checkUser(request.form['username'], request.form['password']):
+                session['user'] = request.form['username']
+            else: return redirect('/login')
     return render_template('login.html')
+
+@app.route("/friends", methods=['GET', 'POST'])
+def getFriends():
+    if request.method == 'GET':
+        if 'user' in session:
+            return jsonify(User.getAllFriend(session['user']))
+        else:
+            return jsonify({
+                'error': 'you must login'
+            })
 
 @app.route("/")
 def home():
