@@ -144,13 +144,20 @@
             });
 
             $.get("/friends", function (data) {
-                console.log(data)
+                    console.log(data)
                     for(friend of data) {
+                        socket.emit('join', {
+                            room: friend.channel_id
+                        });
                         linkRoom(friend)
                         containerRoom(friend)
+                        $('.room').click(function (e) {
+                            e.preventDefault();
+                            room = $(this).attr('data-room');
+                            console.log(room);
+                        });
                     }
-                }
-            );
+            });
 
             function create_UUID() {
                 var dt = new Date().getTime();
@@ -168,17 +175,17 @@
             function linkRoom(room) {
                 $('.room-chat').append(`
                 <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center room"
-                            data-room="${room}"
-                            id="list-${room}-list" data-toggle="list" href="#list-${room}" role="tab" aria-controls="home">
-                    ${room}
+                            data-room="${room.channel_id}"
+                            id="list-${room.channel_id}-list" data-toggle="list" href="#list-${room.channel_id}" role="tab" aria-controls="${room.friend}">
+                    ${room.friend}
                     <span class="badge badge-primary badge-pill">14</span>
                 </a>`)
             }
 
             function containerRoom(room) {
                 $('.chat-container').append(`
-                <div class="tab-pane fade show chat-pane p-3" id="list-${room}" role="tabpanel"
-                        aria-labelledby="list-${room}-list">
+                <div class="tab-pane fade show chat-pane p-3" id="list-${room.channel_id}" role="tabpanel"
+                        aria-labelledby="list-${room.channel_id}-list">
                 </div>
                 `);
             }
@@ -194,6 +201,7 @@
                 $('.room').click(function (e) {
                     e.preventDefault();
                     room = $(this).attr('data-room');
+                    console.log(room);
                 });
 
                 return false;

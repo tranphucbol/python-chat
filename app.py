@@ -14,6 +14,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, \
 close_room, rooms, disconnect
 
 import models.user as User
+import models.channels as Channel
 
 
 app = Flask(__name__)
@@ -26,10 +27,18 @@ def messageReceived(methods=['GET', 'POST']):
 def handle_my_custom_event(message):
     emit('my_respone', {'data': message['data']})
 
+# @socketio.on('connect')
+# def connectRoom():
+#     if 'user' in session:
+#         channels = Channel.getAllChannel(session['user'])
+#         for channel in channels:
+#             join_room(channel['channel_id'])
+            # print(rooms())
+
 @socketio.on('join')
 def join(message):
-    print(message['room'])
     join_room(message['room'])
+    print(rooms())
     emit('my_response', {
         'data': 'In rooms: ' + ', '.join(rooms())
     })
@@ -50,6 +59,7 @@ def close(message):
 
 @socketio.on('my_room_event')
 def send_room_message(message):
+    print(message)
     emit('my_response',{
         'data': message['data'],
         'room': message['room'],
@@ -74,7 +84,9 @@ def login():
 def getFriends():
     if request.method == 'GET':
         if 'user' in session:
-            return jsonify(User.getAllFriend(session['user']))
+            channels = Channel.getAllChannel(session['user'])
+            print(channels)
+            return jsonify(channels)
         else:
             return jsonify({
                 'error': 'you must login'

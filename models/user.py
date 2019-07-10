@@ -76,7 +76,6 @@ def getAllFriend(username):
 
     friends = []
 
-
     for (username,) in cQuery:
         friends.append(username)
     cnx.close()

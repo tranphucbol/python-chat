@@ -15,3 +15,7 @@
     align-items: center;
     width: 100%;
 }
+
+.list-group-flush:first-child .list-group-item {
+    border-radius: 0;
+}

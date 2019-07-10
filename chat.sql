@@ -19,8 +19,8 @@ CREATE TABLE friends (
 );
 
 CREATE TABLE channels (
-    channel_id BIGINT NOT NULL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    channel_id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    name VARCHAR(50)
 );
 
 CREATE TABLE messages (
@@ -30,4 +30,12 @@ CREATE TABLE messages (
     content TEXT NOT NULL,
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id),
     FOREIGN KEY (author_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE users_channels (
+    channel_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    PRIMARY KEY (channel_id, user_id),
+    FOREIGN KEY (channel_id) REFERENCES channels(channel_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
