@@ -24,6 +24,7 @@ def addUser(username, email, password):
     cnx.close()
 
 def checkUser(username, password):
+    print('ping')
     cnx = connect.createConnect()
     cQuery = cnx.cursor()
     cQuery.execute(
@@ -47,12 +48,12 @@ def getUserIdByUsername(username):
     (id,) = cQuery.fetchone()
     return id
 
-def addFriend(username, usernameOfFriend):
+def addFriend(user_id, friend_id):
     cnx = connect.createConnect()
     print('hello')
     data = {
-        'user_id': getUserIdByUsername(username),
-        'friend_id': getUserIdByUsername(usernameOfFriend),
+        'user_id': user_id,
+        'friend_id': friend_id,
         'status': 1
     }
 
@@ -66,17 +67,17 @@ def addFriend(username, usernameOfFriend):
     cnx.commit()
     cnx.close()
 
-def getAllFriend(username):
-    cnx = connect.createConnect()
-    cQuery = cnx.cursor()
-    cQuery.execute(
-        ("SELECT ufriends.username FROM users, friends, users as ufriends WHERE users.username = %(username)s AND users.user_id = friends.user_id AND friends.friend_id = ufriends.user_id"),
-        {'username': username}
-    )
+# def getAllFriend(user_id):
+#     cnx = connect.createConnect()
+#     cQuery = cnx.cursor()
+#     cQuery.execute(
+#         ("SELECT ufriends.username FROM users, friends, users as ufriends WHERE users.username = %(username)s AND users.user_id = friends.user_id AND friends.friend_id = ufriends.user_id"),
+#         {'username': username}
+#     )
 
-    friends = []
+#     friends = []
 
-    for (username,) in cQuery:
-        friends.append(username)
-    cnx.close()
-    return friends
+#     for (username,) in cQuery:
+#         friends.append(username)
+#     cnx.close()
+#     return friends

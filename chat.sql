@@ -26,8 +26,10 @@ CREATE TABLE channels (
 CREATE TABLE messages (
     channel_id BIGINT NOT NULL,
     author_id BIGINT NOT NULL,
-    message_id BIGINT NOT NULL PRIMARY KEY,
+    message_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id),
     FOREIGN KEY (author_id) REFERENCES users(user_id)
 );

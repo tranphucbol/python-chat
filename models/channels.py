@@ -12,9 +12,8 @@ def createChannel():
     cnx.close()
     return id
 
-def addUserToChannel(channel_id, username):
+def addUserToChannel(channel_id, user_id):
     cnx = connect.createConnect()
-    user_id = User.getUserIdByUsername(username)
     cursor = cnx.cursor()
     cursor.execute(
         ('INSERT INTO users_channels (user_id, channel_id) values (%(user_id)s, %(channel_id)s)'),
@@ -26,9 +25,8 @@ def addUserToChannel(channel_id, username):
     cnx.commit()
     cnx.close()
 
-def getAllChannel(username):
+def getAllChannel(user_id):
     cnx = connect.createConnect()
-    user_id = User.getUserIdByUsername(username)
     cursor = cnx.cursor()
     cursor.execute(
         ('SELECT uc.channel_id as channel_id, u.username as friend  FROM users_channels as uc, users_channels as fc, users as u WHERE uc.user_id = %(user_id)s AND uc.channel_id = fc.channel_id AND fc.user_id <> %(user_id)s AND u.user_id = fc.user_id'),

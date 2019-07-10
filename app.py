@@ -15,6 +15,7 @@ close_room, rooms, disconnect
 
 import models.user as User
 import models.channels as Channel
+import models.message as Message
 
 
 app = Flask(__name__)
@@ -59,32 +60,49 @@ def close(message):
 
 @socketio.on('my_room_event')
 def send_room_message(message):
-    print(message)
+
+    Message.addMessage(message['room'], session['user']['user_id'], message['data'])
+
     emit('my_response',{
         'data': message['data'],
         'room': message['room'],
         'id': message['id']       
     }, room=message['room'])
 
-# @socketio.on('disconnect_request')
-# def disconnect_request():
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected', request.sid)
+
+@app.route("/messages/<room>")
+def getMessages(room):
+    if 'user' in session:
+        messages = Message.getAllMessage(room, session['user']['user_id'])
+        return jsonify(messages)
+    else:
+        return jsonify({
+                'error': 'you must login'
+        })
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if 'user' in session:
+        if User.checkUser(request.form['username'], request.form['password']):
+            session['user'] = {
+                'username': request.form['username'],
+                'user_id': User.getUserIdByUsername(request.form['username'])
+            }
             return redirect('/')
-        else:
-            if User.checkUser(request.form['username'], request.form['password']):
-                session['user'] = request.form['username']
-            else: return redirect('/login')
+    
+    if 'user' in session:
+        return redirect('/')
+
     return render_template('login.html')
 
 @app.route("/friends", methods=['GET', 'POST'])
 def getFriends():
     if request.method == 'GET':
         if 'user' in session:
-            channels = Channel.getAllChannel(session['user'])
+            channels = Channel.getAllChannel(session['user']['user_id'])
             print(channels)
             return jsonify(channels)
         else:
@@ -96,7 +114,7 @@ def getFriends():
 def home():
     if 'user' not in session:
         return redirect('/login')
-    return render_template('index.html', user=session['user'])
+    return render_template('index.html', user=session['user']['username'])
 
 if (__name__ == "__main__"):
     app.secret_key = os.urandom(24)

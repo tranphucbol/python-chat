@@ -1,10 +1,11 @@
 .chat-container {
-    background: #f3f7f8;
+    /* background: #f3f7f8; */
+    background: #ffffff;
     width: 100%;
     height: 500px;
 }
 
-.chat-pane {
+.chat-pane, .room-chat {
     overflow-x: auto;
     height: 500px;
 }
@@ -18,4 +19,44 @@
 
 .list-group-flush:first-child .list-group-item {
     border-radius: 0;
+}
+
+::-webkit-scrollbar-track
+{
+
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+    border-radius: 10px;
+    background-color: #c6c6c6;
+}
+
+.bg-ui {
+    border: 0;
+    background: #457fca;
+    background: -webkit-linear-gradient(to left, #5691c8, #457fca); 
+    background: linear-gradient(to left, #5691c8, #457fca);
+    
+}
+
+body {
+    background: #00d2ff;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #3a7bd5, #00d2ff);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #3a7bd5, #00d2ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
+}
+
+.list-group-item.active {
+    background: #457fca;  
+    background: -webkit-linear-gradient(to left, #5691c8, #457fca); 
+    background: linear-gradient(to left, #5691c8, #457fca);
+    border: 0;
 }
