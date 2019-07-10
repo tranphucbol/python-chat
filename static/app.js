@@ -76,7 +76,7 @@ $(document).ready(function () {
                 if(message.author_id !== -1) {
                     messageHTML = `
                         <div class="d-flex">
-                            <div class="card mb-3" style="max-width: 45%; background: #fff; border-radius: 10px">
+                            <div class="card mb-3" style="max-width: 45%; background: #EAEAEA; border:0; border-radius: 5px">
                                 <div class="card-body">
                                     ${message.content}
                                 </div>
@@ -86,7 +86,7 @@ $(document).ready(function () {
                 } else {
                     messageHTML = `
                     <div class="d-flex justify-content-end">
-                        <div class="card text-white bg-ui mb-3 align-self-end" style="max-width: 45%; border-radius: 10px">
+                        <div class="card text-white bg-ui mb-3 align-self-end" style="max-width: 45%; border:0; border-radius: 5px">
                             <div class="card-body">
                                 ${message.content}
                             </div>
@@ -105,8 +105,12 @@ $(document).ready(function () {
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center room"
                     data-room="${room.channel_id}"
                     id="list-${room.channel_id}-list" data-toggle="list" href="#list-${room.channel_id}" role="tab" aria-controls="${room.friend}">
-            ${room.friend}
-            <span class="badge badge-primary badge-pill">14</span>
+            <img src="https://ui-avatars.com/api/?name=${room.friend}&size=60" />
+            <div class="room-content">
+                <b class="m-0">${room.friend}</b>
+                <small>Hello boy!!!</small>
+            </div>
+            <span class="badge-chat">12</span>
         </a>`)
     }
 
