@@ -48,20 +48,52 @@ def getUserIdByUsername(username):
     (id,) = cQuery.fetchone()
     return id
 
-def addFriend(user_id, friend_id):
+def addFriend(user_id, friend_id, status):
     cnx = connect.createConnect()
-    print('hello')
     data = {
         'user_id': user_id,
         'friend_id': friend_id,
-        'status': 1
+        'status': status
     }
-
-    print(data)
 
     cursor = cnx.cursor()
     cursor.execute(
         ("INSERT INTO friends (user_id, friend_id, status) VALUES (%(user_id)s, %(friend_id)s, %(status)s)"),
+        data
+    )
+    cnx.commit()
+    cnx.close()
+
+def getFriendAllByStatus(user_id, status):
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+    cursor.execute(
+        ('SELECT u.user_id as friend_id, u.username as username FROM users u, friends f WHERE f.friend_id = %(user_id)s AND f.status = %(status)s AND f.user_id = u.user_id'),
+        {
+            'user_id': user_id,
+            'status': status
+        }
+    )
+    friendRequests = []
+    for (friend_id, username,) in cursor:
+        friendRequests.append({
+            'friend_id': friend_id,
+            'username': username
+        })
+    cnx.close()
+    return friendRequests
+
+def updateStatusFriend(user_id, friend_id, status):
+    cnx = connect.createConnect()
+    data = {
+        'user_id': user_id,
+        'friend_id': friend_id,
+        'status': status
+    }
+
+    cursor = cnx.cursor()
+    cursor.execute(
+        ("UPDATE friends SET status = %(status)s WHERE user_id = %(friend_id)s AND friend_id = %(user_id)s"),
         data
     )
     cnx.commit()

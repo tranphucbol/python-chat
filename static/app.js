@@ -7,26 +7,10 @@ $(document).ready(function () {
                 containerRoom(message.room);
             }
             if(ids.indexOf(message.id) === -1) {
-                $(`#list-${message.room}`).append(`
-                    <div class="d-flex">
-                        <div class="card mb-3" style="max-width: 45%; background: #fff">
-                            <div class="card-body">
-                                ${message.data}
-                            </div>
-                        </div>
-                    </div>
-                `)
+                $(`#list-${message.room}`).append(bubbleLeft(message.data));
             } else {
                 ids = ids.filter(id => id === message.id);
-                $(`#list-${room}`).append(`
-                <div class="d-flex justify-content-end">
-                    <div class="card text-white bg-primary mb-3 align-self-end" style="max-width: 45%">
-                        <div class="card-body">
-                            ${message.data}
-                        </div>
-                    </div>
-                </div>
-            `);
+                $(`#list-${room}`).append(bubbleRight(message.data));
             }
             $(`#list-${room}`).animate({scrollTop: $(`#list-${room}`)[0].scrollHeight}, 1000);
         } else {
@@ -46,7 +30,6 @@ $(document).ready(function () {
                 $('.room').click(function (e) {
                     e.preventDefault();
                     room = $(this).attr('data-room');
-                    console.log(room);
                 });
             }
 
@@ -74,30 +57,39 @@ $(document).ready(function () {
             for (message of data) {
                 messageHTML = ''
                 if(message.author_id !== -1) {
-                    messageHTML = `
-                        <div class="d-flex">
-                            <div class="card mb-3" style="max-width: 45%; background: #EAEAEA; border:0; border-radius: 5px">
-                                <div class="card-body">
-                                    ${message.content}
-                                </div>
-                            </div>
-                        </div>
-                    `
+                    messageHTML = bubbleLeft(message.content);
                 } else {
-                    messageHTML = `
-                    <div class="d-flex justify-content-end">
-                        <div class="card text-white bg-ui mb-3 align-self-end" style="max-width: 45%; border:0; border-radius: 5px">
-                            <div class="card-body">
-                                ${message.content}
-                            </div>
-                        </div>
-                    </div>
-                    `
+                    messageHTML = bubbleRight(message.content);
                 }
 
                 $(`#list-${room.channel_id}`).append(messageHTML);
             }
+            $(`#list-${room.channel_id}`).scrollTop($(`#list-${room.channel_id}`)[0].scrollHeight);
         })
+    }
+
+    function bubbleLeft(message) {
+        return `
+        <div class="d-flex">
+            <div class="card mb-3 bubble-left" >
+                <div class="card-body">
+                    ${message}
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    function bubbleRight(message) {
+        return `
+        <div class="d-flex justify-content-end">
+            <div class="card text-white bg-ui mb-3 bubble-right">
+                <div class="card-body">
+                    ${message}
+                </div>
+            </div>
+        </div>
+        `;
     }
 
     function linkRoom(room) {
@@ -161,4 +153,12 @@ $(document).ready(function () {
         $('#room_data').val('');
         return false;
     });
+
+    var down = true;
+
+    $('.btn-add').click(function(e) {
+        $('.room-chat').animate({height: `${down ? 440 : 500}px`}, 1000)
+        $('.add-friend-form').slideToggle(1000)
+        down = !down
+    })
 });

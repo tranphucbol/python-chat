@@ -1,11 +1,14 @@
+
+
 .chat-container {
     /* background: #f3f7f8; */
     background: #ffffff;
     width: 100%;
-    height: 500px;
+    /* height: 500px; */
 }
 
-.chat-pane, .room-chat {
+.chat-pane,
+.room-chat {
     overflow-x: auto;
     height: 500px;
 }
@@ -21,36 +24,58 @@
     border-radius: 0;
 }
 
-::-webkit-scrollbar-track
-{
+::-webkit-scrollbar-track {
     border-radius: 10px;
     background-color: transparent;
 }
-
-::-webkit-scrollbar
-{
+::-webkit-scrollbar {
     width: 10px;
     background-color: transparent;
 }
 
-::-webkit-scrollbar-thumb
-{
+.room-chat::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-pane::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(39, 163, 96, 0.5)
 }
 
 .bg-ui {
     border: 0;
-    background: #27A360;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #27A360;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #3BB990, #27A360);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 body {
     font-family: 'Ubuntu', sans-serif;
-    background: #00d2ff;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #3a7bd5, #00d2ff);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #3a7bd5, #00d2ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
+    animation-name: bg;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease;
+    /* background: #00d2ff;
+    background: -webkit-linear-gradient(to right, #3a7bd5, #00d2ff);
+    background: linear-gradient(to right, #3a7bd5, #00d2ff); */
+}
+
+@keyframes bg {
+    0% {
+        background: #00d2ff;
+    }
+
+    50% {
+        background: #3a7bd5;
+    }
+
+    100% {
+        background: #00d2ff;
+    }
 }
 
 .room img {
@@ -59,7 +84,7 @@ body {
 }
 
 .list-group-item.active {
-    background: rgb(36, 145, 105);  
+    background: rgb(36, 145, 105);
     border: 0;
 }
 
@@ -70,11 +95,11 @@ body {
 }
 
 .list-group-item:hover {
-    background: rgba(36, 145, 105, 0.5);  
+    background: rgba(36, 145, 105, 0.5);
 }
 
 .card-chat {
-    border-radius: 5px;
+    border-radius: 8px;
     background: #F7F9FA;
 }
 
@@ -82,9 +107,12 @@ body {
     color: #fff;
     height: 100%;
     z-index: 999;
-    background: #27A360;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #27A360;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #3BB990, #27A360);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 .card-left {
@@ -94,7 +122,7 @@ body {
 
 .card-left .card-chat-header {
     padding: 20px 15px;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 .card-right {
@@ -104,9 +132,9 @@ body {
 .card-right .card-chat-header {
     background: #F7F9FA;
     border: 0;
-    box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
     padding: 10px 20px;
-    border-radius: 0px 5px 0 0;
+    border-radius: 0px 8px 0 0;
 }
 
 .card-right .card-chat-header img {
@@ -116,12 +144,13 @@ body {
 
 .card-right .card-chat-body {
     background: transparent;
-    
+
 }
 
 .card-right .card-chat-footer {
     background: #EBEBEB;
     padding: 10px;
+    border-radius: 0 0 8px 0;
 }
 
 .card-right .card-chat-footer input[type=text] {
@@ -140,9 +169,16 @@ body {
     border-radius: 25px;
     color: #fff;
     padding: 5px 10px;
-    background: #27A360;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #27A360;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #3BB990, #27A360);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.btn-send:hover  {
+    background: #27A360;
 }
 
 .badge-chat {
@@ -162,5 +198,84 @@ body {
 }
 
 .room-content small {
-    color: rgba(255,255,255,0.8)
+    color: rgba(255, 255, 255, 0.8)
+}
+
+.btn-add {
+    color: #27A360;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: #fff;
+    border-radius: 22px;
+    height: 22px;
+    width: 22px;
+    text-align: center;
+    line-height: 22px;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.btn-add:hover {
+    transform: rotate(-180deg) scale(1.1)
+}
+
+.bubble-left {
+    max-width: 45%;
+    border: 0;
+    background: #EAEAEA;
+    border-radius: 8px 8px 8px 1px;
+}
+
+.bubble-right {
+    max-width: 45%;
+    border: 0;
+    border-radius: 8px 8px 1px 8px;
+}
+
+#chat-left-tab .nav-item .nav-link.active{
+    color: #fff;
+}
+#chat-left-tab .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.3rem;
+}
+
+.add-friend {
+
+}
+
+.add-friend img {
+    width: 50px;
+    border-radius: 50px;
+    margin-right: 10px;
+}
+
+.add-friend b {
+    width: 100%;
+}
+
+.btn-add-friend {
+    background: transparent;
+    color: #fff;
+}
+
+.btn-add-friend:hover {
+    color: rgb(20, 85, 51);
+}
+
+.add-friend-form input[type=text]{
+    width: 100%;
+    border: 0;
+    border-radius: 3px;
+    padding: 8px;
+    background: #249269;
+    color: #fff;
+}
+
+.add-friend-form input[type=text]:focus {
+    outline: 0;
+}
+
+.add-friend-form input[type=text]::placeholder {
+    color: rgba(255, 255, 255, 0.5)
 }
