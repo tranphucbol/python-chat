@@ -98,15 +98,61 @@ def login():
 
     return render_template('login.html')
 
-@app.route("/friends", methods=['GET', 'POST'])
-def getFriends():
+@app.route("/channels", methods=['GET', 'POST'])
+def getChannels():
     if request.method == 'GET':
         if 'user' in session:
             channels = Channel.getAllChannel(session['user']['user_id'])
-            print(channels)
             return jsonify(channels)
         else:
             return jsonify({
+                'error': 'you must login'
+            })
+
+@app.route("/friends")
+def getFriends():
+    if 'user' in session:
+        friends = User.getFriendAllByStatus(session['user']['user_id'], 1);
+        return jsonify(friends)
+    else:
+        return jsonify({
+                'error': 'you must login'
+            })
+
+@app.route("/friend-requests", methods=['GET', 'POST'])
+def getFriendRequest():
+    if 'user' in session:
+        user_id = session['user']['user_id']
+        if request.method == 'GET':
+            friendRequests = User.getFriendAllByStatus(user_id , 0)
+            return jsonify(friendRequests)
+        else:
+            friend_id = request.form['friend_id']
+            accept = int(request.form['accept']) 
+            print(request.form)    
+            if accept == 2:
+                User.removeFriend(friend_id, user_id)
+                return jsonify({
+                    'success': 'Reject successfully'
+                })
+            elif accept == 1:
+                User.updateStatusFriend(friend_id, user_id, accept)
+                User.addFriend(user_id, friend_id, 1)
+                channel_id = Channel.createChannel()
+                Channel.addUserToChannel(channel_id, user_id)
+                Channel.addUserToChannel(channel_id, friend_id)
+                data = User.getInfoUser(user_id)
+                return jsonify({
+                    'friend_id': data['user_id'],
+                    'username': data['username']
+                })
+            else:
+                return jsonify({
+                    'error': 'Wrong value'
+                })
+
+    else:
+        return jsonify({
                 'error': 'you must login'
             })
 

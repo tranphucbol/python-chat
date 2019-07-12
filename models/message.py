@@ -47,3 +47,18 @@ def getAllMessage(room, user_id):
     cnx.close()
 
     return messages
+
+def getLastTimeMessage(channel_id):
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+    cursor.execute(
+        ('SELECT MAX(updated_at) as date FROM messages WHERE channel_id = %(channel_id)s'),
+        {
+            'channel_id': channel_id
+        }
+    )
+    (date,) = cursor.fetchone()
+    if date == None:
+        date = datetime.datetime(2000, 1, 1)
+    cnx.close()
+    return date

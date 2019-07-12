@@ -93,11 +93,42 @@ def updateStatusFriend(user_id, friend_id, status):
 
     cursor = cnx.cursor()
     cursor.execute(
-        ("UPDATE friends SET status = %(status)s WHERE user_id = %(friend_id)s AND friend_id = %(user_id)s"),
+        ("UPDATE friends SET status = %(status)s WHERE user_id = %(user_id)s AND friend_id = %(friend_id)s"),
         data
     )
     cnx.commit()
     cnx.close()
+
+def removeFriend(user_id, friend_id):
+    cnx = connect.createConnect()
+    data = {
+        'user_id': user_id,
+        'friend_id': friend_id
+    }
+
+    cursor = cnx.cursor()
+    cursor.execute(
+        ("DELETE FROM friends WHERE user_id = %(user_id)s AND friend_id = %(friend_id)s"),
+        data
+    )
+    cnx.commit()
+    cnx.close()
+
+def getInfoUser(user_id):
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+    cursor.execute(
+        ("SELECT user_id, username FROM users WHERE user_id = %(user_id)s"),
+        {
+            'user_id': user_id
+        }
+    )
+    (user_id, username,) = cursor.fetchone()
+    cnx.close()
+    return {
+        'user_id': user_id,
+        'username': username
+    }
 
 # def getAllFriend(user_id):
 #     cnx = connect.createConnect()

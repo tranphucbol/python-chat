@@ -8,7 +8,7 @@
 }
 
 .chat-pane,
-.room-chat {
+#chat-left-tab-content .tab-pane .list-group {
     overflow-x: auto;
     height: 500px;
 }
@@ -33,7 +33,7 @@
     background-color: transparent;
 }
 
-.room-chat::-webkit-scrollbar-thumb {
+#chat-left-tab-content .tab-pane .list-group::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.2);
 }
@@ -201,24 +201,6 @@ body {
     color: rgba(255, 255, 255, 0.8)
 }
 
-.btn-add {
-    color: #27A360;
-    font-size: 0.8rem;
-    font-weight: bold;
-    background: #fff;
-    border-radius: 22px;
-    height: 22px;
-    width: 22px;
-    text-align: center;
-    line-height: 22px;
-    transition: all 0.5s ease;
-    cursor: pointer;
-}
-
-.btn-add:hover {
-    transform: rotate(-180deg) scale(1.1)
-}
-
 .bubble-left {
     max-width: 45%;
     border: 0;
@@ -238,10 +220,6 @@ body {
 #chat-left-tab .nav-item .nav-link {
     color: rgba(255, 255, 255, 0.5);
     font-size: 1.3rem;
-}
-
-.add-friend {
-
 }
 
 .add-friend img {
@@ -278,4 +256,10 @@ body {
 
 .add-friend-form input[type=text]::placeholder {
     color: rgba(255, 255, 255, 0.5)
+}
+
+.btn-header {
+    background: transparent;
+    color: #fff;
+    padding: 5px;
 }

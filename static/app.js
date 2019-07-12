@@ -10,16 +10,17 @@ $(document).ready(function () {
                 $(`#list-${message.room}`).append(bubbleLeft(message.data));
             } else {
                 ids = ids.filter(id => id === message.id);
-                $(`#list-${room}`).append(bubbleRight(message.data));
+                $(`#list-${message.room}`).append(bubbleRight(message.data));
             }
-            $(`#list-${room}`).animate({scrollTop: $(`#list-${room}`)[0].scrollHeight}, 1000);
+            $(`#list-${message.room}`).animate({scrollTop: $(`#list-${message.room}`)[0].scrollHeight}, 1000);
+            updateLastMessage(message.room);
         } else {
             console.log(message.data)
         }
         console.log(message);
     });
 
-    $.get("/friends", function (data) {
+    $.get("/channels", function (data) {
             for(friend of data) {
                 socket.emit('join', {
                     room: friend.channel_id
@@ -27,16 +28,35 @@ $(document).ready(function () {
                 linkRoom(friend)
                 containerRoom(friend)
                 loadMessage(friend)
-                $('.room').click(function (e) {
-                    e.preventDefault();
-                    room = $(this).attr('data-room');
-                });
             }
+
+            $('.room').click(function (e) {
+                e.preventDefault();
+                room = $(this).attr('data-room');
+                updateHeaderChat(room);
+                $('.room-chat a').on('shown.bs.tab', function() {
+                    $(`#list-${room}`).scrollTop($(`#list-${room}`)[0].scrollHeight);
+                });
+            });
 
             if(data.length !== 0) {
                 room = `${data[0].channel_id}`
                 $(`#list-${data[0].channel_id}-list`).tab('show');
+                updateHeaderChat(data[0].channel_id);
             }
+    });
+
+    $.get("/friends", function(data) {
+        for(friend of data) {
+            $('#list-contact .list-group').append(`
+            <a
+                id="friend-request-${friend.friend_id}"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
+                <img src="https://ui-avatars.com/api/?name=${friend.username}&size=60" />
+                <b>${friend.username}</b>
+            </a>
+            `);
+        }
     });
 
     function create_UUID() {
@@ -65,12 +85,28 @@ $(document).ready(function () {
                 $(`#list-${room.channel_id}`).append(messageHTML);
             }
             $(`#list-${room.channel_id}`).scrollTop($(`#list-${room.channel_id}`)[0].scrollHeight);
+            updateLastMessage(room.channel_id);
         })
+    }
+
+    function getLastMessage(room) {
+        return $(`#list-${room} .message:last-child .card-body`).text().trim();
+    }
+
+    function updateLastMessage(room) {
+        $(`#list-${room}-list .room-content small`).text(getLastMessage(room));
+    }
+
+    function updateHeaderChat(room) {
+        var src = $(`#list-${room}-list img`).attr('src');
+        var name = $(`#list-${room}-list .room-content b`).text().trim();
+        $('.card-right .card-chat-header img').attr('src', src);
+        $('.card-right .card-chat-header h3').text(name)
     }
 
     function bubbleLeft(message) {
         return `
-        <div class="d-flex">
+        <div class="d-flex message">
             <div class="card mb-3 bubble-left" >
                 <div class="card-body">
                     ${message}
@@ -82,7 +118,7 @@ $(document).ready(function () {
 
     function bubbleRight(message) {
         return `
-        <div class="d-flex justify-content-end">
+        <div class="d-flex message justify-content-end">
             <div class="card text-white bg-ui mb-3 bubble-right">
                 <div class="card-body">
                     ${message}
@@ -114,6 +150,46 @@ $(document).ready(function () {
         `);
     }
 
+    function addNotificationEmpty(className, messasge) {
+        $(`#${className}`).append(`<p style="display: none" class="text-center">${messasge}</p>`);
+        $(`#${className} .list-group`).css({'display': 'none'});
+        $(`#${className} p`).fadeIn();
+    }
+
+    $.get('/friend-requests', function(data) {
+        if(data.length === 0) {
+            addNotificationEmpty('list-add-friend', 'There are not friend invitations');
+        }
+        for (request of data) {
+            $('#list-add-friend .list-group').append(`
+            <a
+                id="friend-request-${request.friend_id}"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
+                <img src="https://ui-avatars.com/api/?name=${request.username}&size=60" />
+                <b>${request.username}</b>
+                <div class="d-flex">
+                    <button class="btn btn-add-friend" data-accept=1 data-user-id=${request.friend_id}><i class="fas fa-check"></i></button>
+                    <button class="btn btn-add-friend" data-accept=2 data-user-id=${request.friend_id}><i class="fas fa-times"></i></button>
+                </div>
+            </a>
+            `);
+        }
+
+        $('.btn-add-friend').click(function() {
+            var accept = $(this).attr('data-accept');
+            var friend_id = $(this).attr('data-user-id');
+            $.post('/friend-requests', {accept, friend_id}, function(data) {
+                $(`#friend-request-${friend_id}`).slideUp(400, function() {
+                        $(`#friend-request-${friend_id}`).remove();
+                        if($('#list-add-friend .list-group a').length === 0) {
+                            addNotificationEmpty('list-add-friend', 'There are not friend invitations');
+                        }
+                });
+            });
+        });
+
+    });
+
     $('#join').submit(function (e) {
         socket.emit('join', {
             room: $('#join_room').val()
@@ -125,7 +201,7 @@ $(document).ready(function () {
         $('.room').click(function (e) {
             e.preventDefault();
             room = $(this).attr('data-room');
-            console.log(room);
+            // console.log(room);
         });
 
         return false;
@@ -157,8 +233,8 @@ $(document).ready(function () {
     var down = true;
 
     $('.btn-add').click(function(e) {
-        $('.room-chat').animate({height: `${down ? 440 : 500}px`}, 1000)
-        $('.add-friend-form').slideToggle(1000)
+        $('#chat-left-tab-content .tab-pane .list-group ').animate({height: `${down ? 440 : 500}px`}, 500)
+        $('.add-friend-form').slideToggle(500)
         down = !down
     })
 });
