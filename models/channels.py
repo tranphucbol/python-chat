@@ -18,7 +18,7 @@ def addUserToChannel(channel_id, user_id):
     cnx = connect.createConnect()
     cursor = cnx.cursor()
     cursor.execute(
-        ('INSERT INTO users_channels (user_id, channel_id) values (%(user_id)s, %(channel_id)s)'),
+        ('INSERT INTO users_channels (user_id, channel_id, seen) values (%(user_id)s, %(channel_id)s, now())'),
         {
             'user_id': user_id,
             'channel_id': channel_id,

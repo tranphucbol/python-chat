@@ -1,5 +1,27 @@
 $(document).ready(function () {
-    var socket = io.connect('http://' + document.domain + ':' + location.port)
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+    function heightHeader() {
+        var left = $('.card-left .card-chat-header').height();
+        var right = $('.card-right .card-chat-header').height();
+        if(left > right) {
+            $('.card-chat .card-chat-header').height(left);
+        } else {
+            $('.card-chat .card-chat-header').height(right);
+        }
+    }
+
+    function resizeWindow() {
+        heightHeader();
+        var heightHeaderLeft = $('.card-left .card-chat-header').height() + $('#chat-left-tab').height();
+        var heightHeaderFooterRight = $('.card-right .card-chat-header').height() + $('.card-right .card-chat-footer').height();
+        $('#chat-left-tab-content .tab-pane .list-group').height($(window).height() - heightHeaderLeft);
+        $('.chat-container').height($(window).height() - heightHeaderFooterRight);
+    }
+    $(window).resize(resizeWindow);
+    resizeWindow();
+
+    
     socket.on('my_response', function (message, cb) {
         if (message.room !== undefined) {
             if ($(`#list-${message.room}`).length === 0) {
@@ -8,32 +30,56 @@ $(document).ready(function () {
             }
             if(ids.indexOf(message.id) === -1) {
                 $(`#list-${message.room}`).append(bubbleLeft(message.data));
+                if(message.room !== room) {
+                    var countNotSeen = parseInt($(`#list-${message.room}-list .badge-chat`).text().trim());
+                    countNotSeen = isNaN(countNotSeen) ? 1 : countNotSeen + 1;
+                    updateNotSeen(message.room, {count: countNotSeen})
+                }
             } else {
                 ids = ids.filter(id => id === message.id);
                 $(`#list-${message.room}`).append(bubbleRight(message.data));
+                updateNotSeen(message.room, {count: 0, time: convertToTime(message.data.time)})
             }
             $(`#list-${message.room}`).animate({scrollTop: $(`#list-${message.room}`)[0].scrollHeight}, 1000);
             updateLastMessage(message.room);
         } else {
-            console.log(message.data)
+            // console.log(message.data)
         }
-        console.log(message);
+        // console.log(message);
     });
+
+    function convertToTime(time) {
+        return moment(new Date(time.substring(0, time.length - 4))).format('HH:mm')
+    }
+
+    function getAjaxNotSeen(channel_id) {
+        $.get(`/no-seen/${channel_id}`, function(data) {
+            updateNotSeen(channel_id, {count: data.count, time: convertToTime(data.time)});
+        });
+    }
+
+    function updateAjaxSeen(channel_id) {
+        $.get(`/seen/${channel_id}`, function(data) {
+            updateNotSeen(channel_id, {count: 0, time: getLastMessage(channel_id).time})
+        });
+    }
 
     $.get("/channels", function (data) {
             for(friend of data) {
                 socket.emit('join', {
                     room: friend.channel_id
                 });
-                linkRoom(friend)
-                containerRoom(friend)
-                loadMessage(friend)
+                linkRoom(friend);
+                containerRoom(friend);
+                loadMessage(friend);
+                getAjaxNotSeen(friend.channel_id);
             }
 
             $('.room').click(function (e) {
                 e.preventDefault();
                 room = $(this).attr('data-room');
                 updateHeaderChat(room);
+                updateAjaxSeen(room);
                 $('.room-chat a').on('shown.bs.tab', function() {
                     $(`#list-${room}`).scrollTop($(`#list-${room}`)[0].scrollHeight);
                 });
@@ -73,13 +119,13 @@ $(document).ready(function () {
 
     function loadMessage(room) {
 
-        $.get(`/messages/${room.channel_id}`, function(data) {
-            for (message of data) {
+        $.get(`/messages/${room.channel_id}`, function(messages) {
+            for (message of messages) {
                 messageHTML = ''
                 if(message.author_id !== -1) {
-                    messageHTML = bubbleLeft(message.content);
+                    messageHTML = bubbleLeft(message.data);
                 } else {
-                    messageHTML = bubbleRight(message.content);
+                    messageHTML = bubbleRight(message.data);
                 }
 
                 $(`#list-${room.channel_id}`).append(messageHTML);
@@ -88,13 +134,29 @@ $(document).ready(function () {
             updateLastMessage(room.channel_id);
         })
     }
+    
+    function updateNotSeen(channel_id, data) {
+        if($(`#list-${channel_id}-list>small`).length > 0) {
+            $(`#list-${channel_id}-list>small`).remove()
+        }
+
+        if(data.count == 0) {
+            $(`#list-${channel_id}-list`).append(`<small>${data.time}</small>`)
+        } else {
+            console.log(`#list-${channel_id}-list`);
+            $(`#list-${channel_id}-list`).append(`<small class="badge-chat">${data.count}</small>`)
+        }
+    }
 
     function getLastMessage(room) {
-        return $(`#list-${room} .message:last-child .card-body`).text().trim();
+        return {
+            content: $(`#list-${room} .message:last-child p`).text().trim(),
+            time: $(`#list-${room} .message:last-child small`).text().trim()
+        }
     }
 
     function updateLastMessage(room) {
-        $(`#list-${room}-list .room-content small`).text(getLastMessage(room));
+        $(`#list-${room}-list .room-content small`).text(getLastMessage(room).content);
     }
 
     function updateHeaderChat(room) {
@@ -104,25 +166,23 @@ $(document).ready(function () {
         $('.card-right .card-chat-header h3').text(name)
     }
 
-    function bubbleLeft(message) {
+    function bubbleLeft(data) {
         return `
         <div class="d-flex message">
-            <div class="card mb-3 bubble-left" >
-                <div class="card-body">
-                    ${message}
-                </div>
+            <div class="bubble bubble-left" >
+                <p class="m-0">${data.content}</p>
+                <small>${convertToTime(data.time)}</small>
             </div>
         </div>
         `;
     }
 
-    function bubbleRight(message) {
+    function bubbleRight(data) {
         return `
         <div class="d-flex message justify-content-end">
-            <div class="card text-white bg-ui mb-3 bubble-right">
-                <div class="card-body">
-                    ${message}
-                </div>
+            <div class="bg-ui bubble bubble-right">
+                <p class="m-0">${data.content}</p>
+                <small>${convertToTime(data.time)}</small>
             </div>
         </div>
         `;
@@ -138,7 +198,6 @@ $(document).ready(function () {
                 <b class="m-0">${room.friend}</b>
                 <small>Hello boy!!!</small>
             </div>
-            <span class="badge-chat">12</span>
         </a>`)
     }
 
@@ -151,7 +210,7 @@ $(document).ready(function () {
     }
 
     function addNotificationEmpty(className, messasge) {
-        $(`#${className}`).append(`<p style="display: none" class="text-center">${messasge}</p>`);
+        $(`#${className}`).append(`<p style="display: none;" class="text-center my-3">${messasge}</p>`);
         $(`#${className} .list-group`).css({'display': 'none'});
         $(`#${className} p`).fadeIn();
     }
@@ -217,7 +276,7 @@ $(document).ready(function () {
     var ids = [];
 
     $('#send_room').submit(function (e) {
-        if (room !== '') {
+        if (room !== '' && $('#room_data').val() != '') {
             var id = create_UUID();
             ids.push(id);
             socket.emit('my_room_event', {

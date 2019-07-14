@@ -37,6 +37,7 @@ CREATE TABLE messages (
 CREATE TABLE users_channels (
     channel_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
+    seen DATETIME NOT NULL,
     PRIMARY KEY (channel_id, user_id),
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)

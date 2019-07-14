@@ -11,7 +11,7 @@ from flask import (
 import os
 import datetime
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
-close_room, rooms, disconnect
+    close_room, rooms, disconnect
 
 import models.user as User
 import models.channels as Channel
@@ -21,8 +21,10 @@ import models.message as Message
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+
 def messageReceived(methods=['GET', 'POST']):
     print('message was received!!!')
+
 
 @socketio.on('my event')
 def handle_my_custom_event(message):
@@ -34,22 +36,24 @@ def handle_my_custom_event(message):
 #         channels = Channel.getAllChannel(session['user'])
 #         for channel in channels:
 #             join_room(channel['channel_id'])
-            # print(rooms())
+    # print(rooms())
+
 
 @socketio.on('join')
 def join(message):
     join_room(message['room'])
-    print(rooms())
     emit('my_response', {
         'data': 'In rooms: ' + ', '.join(rooms())
     })
 
+
 @socketio.on('leave')
 def leave(message):
     leave_room(message['room'])
-    emit('my_response',{
+    emit('my_response', {
         'data': 'In rooms: ' + ', '.join(rooms())
     })
+
 
 @socketio.on('close_room')
 def close(message):
@@ -58,20 +62,27 @@ def close(message):
     }, room=message['room'])
     close_room(message['room'])
 
+
 @socketio.on('my_room_event')
 def send_room_message(message):
 
-    Message.addMessage(message['room'], session['user']['user_id'], message['data'])
+    Message.addMessage(message['room'], session['user']
+                       ['user_id'], message['data'])
 
-    emit('my_response',{
-        'data': message['data'],
+    emit('my_response', {
+        'data': {
+            'content': message['data'],
+            'time': datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S GMT")
+        },
         'room': message['room'],
-        'id': message['id']       
+        'id': message['id']
     }, room=message['room'])
+
 
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected', request.sid)
+
 
 @app.route("/messages/<room>")
 def getMessages(room):
@@ -80,8 +91,9 @@ def getMessages(room):
         return jsonify(messages)
     else:
         return jsonify({
-                'error': 'you must login'
+            'error': 'you must login'
         })
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -92,11 +104,12 @@ def login():
                 'user_id': User.getUserIdByUsername(request.form['username'])
             }
             return redirect('/')
-    
+
     if 'user' in session:
         return redirect('/')
 
     return render_template('login.html')
+
 
 @app.route("/channels", methods=['GET', 'POST'])
 def getChannels():
@@ -109,27 +122,28 @@ def getChannels():
                 'error': 'you must login'
             })
 
+
 @app.route("/friends")
 def getFriends():
     if 'user' in session:
-        friends = User.getFriendAllByStatus(session['user']['user_id'], 1);
+        friends = User.getFriendAllByStatus(session['user']['user_id'], 1)
         return jsonify(friends)
     else:
         return jsonify({
-                'error': 'you must login'
-            })
+            'error': 'you must login'
+        })
+
 
 @app.route("/friend-requests", methods=['GET', 'POST'])
 def getFriendRequest():
     if 'user' in session:
         user_id = session['user']['user_id']
         if request.method == 'GET':
-            friendRequests = User.getFriendAllByStatus(user_id , 0)
+            friendRequests = User.getFriendAllByStatus(user_id, 0)
             return jsonify(friendRequests)
         else:
             friend_id = request.form['friend_id']
-            accept = int(request.form['accept']) 
-            print(request.form)    
+            accept = int(request.form['accept'])
             if accept == 2:
                 User.removeFriend(friend_id, user_id)
                 return jsonify({
@@ -153,14 +167,43 @@ def getFriendRequest():
 
     else:
         return jsonify({
+            'error': 'you must login'
+        })
+
+
+@app.route("/no-seen/<room>")
+def getSeen(room):
+    if 'user' in session:
+        channel_id = int(room[5:len(room)])
+        return jsonify({
+            'count': Message.getCountNotSeen(room, session['user']['user_id']),
+            'time': Message.getLastTimeMessage(channel_id)
+        })
+    else:
+        return jsonify({
+            'error': 'you must login'
+        })
+
+
+@app.route("/seen/<room>")
+def updateSeen(room):
+        if 'user' in session:
+            Message.updateSeen(room, session['user']['user_id'])
+            return jsonify({
+                'sucess': 'done'
+            })
+        else:
+            return jsonify({
                 'error': 'you must login'
             })
+
 
 @app.route("/")
 def home():
     if 'user' not in session:
         return redirect('/login')
     return render_template('index.html', user=session['user']['username'])
+
 
 if (__name__ == "__main__"):
     app.secret_key = os.urandom(24)

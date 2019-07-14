@@ -1,26 +1,34 @@
 import datetime
 import connect
 
+
 def addMessage(room, author_id, message):
     channel_id = int(room[5:len(room)])
     data = {
         'channel_id': channel_id,
         'author_id': author_id,
-        'content': message,
-        'created_at': datetime.datetime.now(),
-        'updated_at': datetime.datetime.now() 
+        'content': message
     }
 
     cnx = connect.createConnect()
     cursor = cnx.cursor()
+    cursorSeen = cnx.cursor()
 
     cursor.execute(
-        ('INSERT INTO messages (channel_id, author_id, content, created_at, updated_at) VALUES (%(channel_id)s, %(author_id)s, %(content)s, %(created_at)s, %(updated_at)s)'),
+        ('INSERT INTO messages (channel_id, author_id, content, created_at, updated_at) VALUES (%(channel_id)s, %(author_id)s, %(content)s, now(), now())'),
         data
+    )
+    cursorSeen.execute(
+        ('UPDATE users_channels SET seen = now() WHERE user_id = %(user_id)s AND channel_id = %(channel_id)s'),
+        {
+            'user_id': author_id,
+            'channel_id': channel_id
+        }
     )
     cnx.commit()
 
     cnx.close()
+
 
 def getAllMessage(room, user_id):
     channel_id = int(room[5:len(room)])
@@ -40,13 +48,55 @@ def getAllMessage(room, user_id):
             author_id = -1
         messages.append({
             'author_id': author_id,
-            'content': content,
-            'updated_at': updated_at
+            'data': {
+                'content': content,
+                'time': updated_at,
+            }
         })
 
     cnx.close()
 
     return messages
+
+
+def getCountNotSeen(room, user_id):
+    channel_id = int(room[5:len(room)])
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+
+    cursor.execute(
+        ('SELECT COUNT(m.message_id) as count '
+         'FROM users_channels uc, messages m '
+         'WHERE uc.user_id = %(user_id)s '
+         'AND uc.channel_id = %(channel_id)s '
+         'AND m.channel_id = %(channel_id)s '
+         'AND m.updated_at > uc.seen'),
+        {
+            'user_id': user_id,
+            'channel_id': channel_id
+        }
+    )
+    (count,) = cursor.fetchone()
+    cnx.close()
+    return count
+
+
+def updateSeen(room, user_id):
+    channel_id = int(room[5:len(room)])
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+
+    cursor.execute(
+        ('UPDATE users_channels SET seen = now() WHERE user_id = %(user_id)s AND channel_id = %(channel_id)s'),
+        {
+            'user_id': user_id,
+            'channel_id': channel_id
+        }
+    )
+
+    cnx.commit()
+    cnx.close()
+
 
 def getLastTimeMessage(channel_id):
     cnx = connect.createConnect()

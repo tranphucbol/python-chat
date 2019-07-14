@@ -9,8 +9,8 @@ def addUser(username, email, password):
         'email': email,
         'password': bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
         'status': 1,
-        'createdAt': datetime.datetime.now(),
-        'updatedAt' : datetime.datetime.now()
+        'createdAt': datetime.datetime.now().astimezone(),
+        'updatedAt' : datetime.datetime.now().astimezone()
     }
 
     cnx = connect.createConnect()

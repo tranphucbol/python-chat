@@ -1,16 +1,21 @@
-
+.m-container {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+}
 
 .chat-container {
-    /* background: #f3f7f8; */
     background: #ffffff;
     width: 100%;
-    /* height: 500px; */
 }
 
 .chat-pane,
 #chat-left-tab-content .tab-pane .list-group {
     overflow-x: auto;
-    height: 500px;
+}
+
+.chat-pane {
+    height: inherit;
 }
 
 .container-center {
@@ -27,41 +32,27 @@
 ::-webkit-scrollbar-track {
     border-radius: 10px;
     background-color: transparent;
+    display: none;
 }
 ::-webkit-scrollbar {
     width: 10px;
     background-color: transparent;
+    display: none;
 }
 
-#chat-left-tab-content .tab-pane .list-group::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.chat-pane::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background-color: rgba(39, 163, 96, 0.5)
+    background-color: rgba(36, 104, 168, 0.5);
+    display: none;
 }
 
 .bg-ui {
     border: 0;
-    background: #27A360;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #CDEAFC;
 }
 
 body {
     font-family: 'Ubuntu', sans-serif;
-    animation-name: bg;
-    animation-duration: 4s;
-    animation-iteration-count: infinite;
-    animation-timing-function: ease;
-    /* background: #00d2ff;
-    background: -webkit-linear-gradient(to right, #3a7bd5, #00d2ff);
-    background: linear-gradient(to right, #3a7bd5, #00d2ff); */
 }
 
 @keyframes bg {
@@ -78,63 +69,62 @@ body {
     }
 }
 
+.room {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+}
+
 .room img {
     border-radius: 50%;
-    width: 50px;
+    width: 60px;
+    margin-right: 10px;
 }
 
 .list-group-item.active {
-    background: rgb(36, 145, 105);
+    background: #F1F6FC;
     border: 0;
 }
 
 .list-group-item {
-    background: transparent;
+    position: relative;
+    background: #fff;
     border: 0;
-    color: #fff;
 }
 
 .list-group-item:hover {
-    background: rgba(36, 145, 105, 0.5);
+    color: rgb(93, 146, 188);
+    /* background: #CDEAFC; */
 }
 
 .card-chat {
-    border-radius: 8px;
+    border: 1px solid #eaeaea;
     background: #F7F9FA;
 }
 
-.card-left {
-    color: #fff;
-    height: 100%;
-    z-index: 999;
-    background: #27A360;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+.card-chat .card-chat-header {
+    border-bottom: 1px solid #eaeaea;
+    height: 90px;
 }
 
 .card-left {
-    padding-right: 20px;
-    margin-right: -20px;
+    height: 100%;
+    background: #fff;
+    border-left:0;
 }
 
 .card-left .card-chat-header {
-    padding: 20px 15px;
-    border-radius: 8px;
+    padding: 0 15px;
+    /* border-radius: 8px; */
 }
 
 .card-right {
-    background: #F7F9FA;
+    background: #F6F6F6;
+    border-left: 0;
 }
 
 .card-right .card-chat-header {
-    background: #F7F9FA;
-    border: 0;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
-    border-radius: 0px 8px 0 0;
+    background: #FFFFFF;
+    padding: 0px 20px;
 }
 
 .card-right .card-chat-header img {
@@ -148,9 +138,9 @@ body {
 }
 
 .card-right .card-chat-footer {
-    background: #EBEBEB;
+    background: #FAFAFA;
     padding: 10px;
-    border-radius: 0 0 8px 0;
+    border-top:1px solid #eaeaea;
 }
 
 .card-right .card-chat-footer input[type=text] {
@@ -169,12 +159,7 @@ body {
     border-radius: 25px;
     color: #fff;
     padding: 5px 10px;
-    background: #27A360;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3BB990, #27A360);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3BB990, #27A360);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: transparent;
 }
 
 .btn-send:hover  {
@@ -183,8 +168,8 @@ body {
 
 .badge-chat {
     font-size: 0.7rem;
-    background: #fff;
-    color: #27A360;
+    background: #3F91CA;
+    color: #fff;
     padding: 2px 7px;
     border-radius: 15px;
     font-weight: 800;
@@ -195,30 +180,70 @@ body {
     flex-direction: column;
     width: 100%;
     margin-left: 10px;
+    font-weight: bold;
 }
 
 .room-content small {
-    color: rgba(255, 255, 255, 0.8)
+    color: rgba(0, 0, 0, 0.4);
+    font-weight: bold;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+}
+
+.list-group-item.active {
+    color: rgba(93, 146, 188);
+}
+
+.list-group-item.active .room-content small,
+.list-group-item:hover .room-content small {
+    color: rgba(93, 146, 188, 0.7);
+}
+
+.bubble {
+    max-width: 45%;
+    border: 0;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.bubble small {
+    display: block;
+    margin: 2px 0px;
 }
 
 .bubble-left {
-    max-width: 45%;
-    border: 0;
     background: #EAEAEA;
     border-radius: 8px 8px 8px 1px;
 }
 
+.bubble-left small {
+    color: rgba(0, 0, 0, 0.6)
+}
+
 .bubble-right {
-    max-width: 45%;
-    border: 0;
+    color: rgb(93, 146, 188);
     border-radius: 8px 8px 1px 8px;
 }
 
+.bubble-right small {
+    color: rgba(93, 146, 188, 0.8)
+}
+
+#chat-left-tab {
+    background: #F4F4F6;
+    border-bottom: 1px solid #eaeaea;
+}
+
 #chat-left-tab .nav-item .nav-link.active{
-    color: #fff;
+    color: #3F91CA;
+    border-bottom: 2px solid #3F91CA;
 }
 #chat-left-tab .nav-item .nav-link {
-    color: rgba(255, 255, 255, 0.5);
+    color: #B5C1CD;
+    /* color: rgba(60, 159, 247, 0.5); */
     font-size: 1.3rem;
 }
 
