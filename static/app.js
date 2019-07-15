@@ -14,7 +14,7 @@ $(document).ready(function () {
     function resizeWindow() {
         heightHeader();
         var heightHeaderLeft = $('.card-left .card-chat-header').height() + $('#chat-left-tab').height();
-        var heightHeaderFooterRight = $('.card-right .card-chat-header').height() + $('.card-right .card-chat-footer').height();
+        var heightHeaderFooterRight = $('.card-right .card-chat-header').height() + $('.card-right .card-chat-footer').outerHeight();
         $('#chat-left-tab-content .tab-pane .list-group').height($(window).height() - heightHeaderLeft);
         $('.chat-container').height($(window).height() - heightHeaderFooterRight);
     }
@@ -23,11 +23,7 @@ $(document).ready(function () {
 
     
     socket.on('my_response', function (message, cb) {
-        if (message.room !== undefined) {
-            if ($(`#list-${message.room}`).length === 0) {
-                linkRoom(message.room);
-                containerRoom(message.room);
-            }
+        if (message.type === 'message') {
             if(ids.indexOf(message.id) === -1) {
                 $(`#list-${message.room}`).append(bubbleLeft(message.data));
                 if(message.room !== room) {
@@ -42,6 +38,21 @@ $(document).ready(function () {
             }
             $(`#list-${message.room}`).animate({scrollTop: $(`#list-${message.room}`)[0].scrollHeight}, 1000);
             updateLastMessage(message.room);
+        } else if (message.type === 'seen') {
+            if(ids.indexOf(message.id) === -1) {
+                updateLastMessage(message.room, true);
+            } else {
+                ids = ids.filter(id => id === message.id);
+            }
+        } else if(message.type === 'friend-request') {
+            addFriend(message);
+            removeNotificationEmpty('#list-add-friend');
+            $('.btn-add-friend').click(addFriendEvent);
+        } else if(message.type === 'create-room') {
+            if ($(`#list-${message.data.channel_id}`).length === 0) {
+                createRoom(message.data);
+                $('.room').click(roomClickEvent);
+            }
         } else {
             // console.log(message.data)
         }
@@ -58,39 +69,58 @@ $(document).ready(function () {
         });
     }
 
-    function updateAjaxSeen(channel_id) {
-        $.get(`/seen/${channel_id}`, function(data) {
-            updateNotSeen(channel_id, {count: 0, time: getLastMessage(channel_id).time})
-        });
+    function getAjaxSeen(channel_id) {
+        $.get(`/seen-user/${channel_id}`, function(data) {
+            updateLastMessage(channel_id, data.status);
+        })
     }
 
-    $.get("/channels", function (data) {
-            for(friend of data) {
-                socket.emit('join', {
-                    room: friend.channel_id
-                });
-                linkRoom(friend);
-                containerRoom(friend);
-                loadMessage(friend);
-                getAjaxNotSeen(friend.channel_id);
+    function updateAjaxSeen(channel_id) {
+        $.get(`/seen/${channel_id}`, function(data) {
+            updateNotSeen(channel_id, {count: 0, time: getLastMessage(channel_id).time});
+            var id = create_UUID();
+            ids.push(id);
+            socket.emit('seen_event', {
+                room: channel_id,
+                id: id
+            });
+        })
+    }
+
+    $.get("/channels", function (channels) {
+            for(channel of channels) {
+                createRoom(channel);
             }
 
-            $('.room').click(function (e) {
-                e.preventDefault();
-                room = $(this).attr('data-room');
-                updateHeaderChat(room);
-                updateAjaxSeen(room);
-                $('.room-chat a').on('shown.bs.tab', function() {
-                    $(`#list-${room}`).scrollTop($(`#list-${room}`)[0].scrollHeight);
-                });
-            });
+            $('.room').click(roomClickEvent);
 
-            if(data.length !== 0) {
-                room = `${data[0].channel_id}`
-                $(`#list-${data[0].channel_id}-list`).tab('show');
-                updateHeaderChat(data[0].channel_id);
+            if(channels.length !== 0) {
+                room = `${channels[0].channel_id}`
+                $(`#list-${channels[0].channel_id}-list`).tab('show');
+                updateHeaderChat(channels[0].channel_id);
             }
     });
+
+    function createRoom(channel) {
+        socket.emit('join', {
+            room: channel.channel_id
+        });
+        linkRoom(channel);
+        containerRoom(channel);
+        loadMessage(channel);
+        getAjaxNotSeen(channel.channel_id);
+        getAjaxSeen(channel.channel_id);
+    }
+
+    function roomClickEvent(e) {
+        e.preventDefault();
+        room = $(this).attr('data-room');
+        updateHeaderChat(room);
+        updateAjaxSeen(room);
+        $('.room-chat a').on('shown.bs.tab', function() {
+            $(`#list-${room}`).scrollTop($(`#list-${room}`)[0].scrollHeight);
+        });
+    }
 
     $.get("/friends", function(data) {
         for(friend of data) {
@@ -143,7 +173,6 @@ $(document).ready(function () {
         if(data.count == 0) {
             $(`#list-${channel_id}-list`).append(`<small>${data.time}</small>`)
         } else {
-            console.log(`#list-${channel_id}-list`);
             $(`#list-${channel_id}-list`).append(`<small class="badge-chat">${data.count}</small>`)
         }
     }
@@ -151,12 +180,15 @@ $(document).ready(function () {
     function getLastMessage(room) {
         return {
             content: $(`#list-${room} .message:last-child p`).text().trim(),
-            time: $(`#list-${room} .message:last-child small`).text().trim()
+            time: $(`#list-${room} .message:last-child .message-time`).text().trim()
         }
     }
 
-    function updateLastMessage(room) {
+    function updateLastMessage(room, status = false) {
         $(`#list-${room}-list .room-content small`).text(getLastMessage(room).content);
+
+        $(`#list-${room} .message .send-status`).remove();
+        $(`#list-${room} .message:last-child .bubble-right .d-flex`).append(`<small class="send-status ml-3">${status ? 'Seen' : 'Sent'}</small>`);
     }
 
     function updateHeaderChat(room) {
@@ -168,10 +200,12 @@ $(document).ready(function () {
 
     function bubbleLeft(data) {
         return `
-        <div class="d-flex message">
-            <div class="bubble bubble-left" >
+        <div class="d-flex message" >
+            <div class="bubble bubble-left">
                 <p class="m-0">${data.content}</p>
-                <small>${convertToTime(data.time)}</small>
+                <div class="d-flex justify-content-between">
+                    <small class="message-time">${convertToTime(data.time)}</small>
+                </div>
             </div>
         </div>
         `;
@@ -182,7 +216,9 @@ $(document).ready(function () {
         <div class="d-flex message justify-content-end">
             <div class="bg-ui bubble bubble-right">
                 <p class="m-0">${data.content}</p>
-                <small>${convertToTime(data.time)}</small>
+                <div class="d-flex justify-content-between">
+                    <small class="message-time">${convertToTime(data.time)}</small>
+                </div>
             </div>
         </div>
         `;
@@ -210,61 +246,57 @@ $(document).ready(function () {
     }
 
     function addNotificationEmpty(className, messasge) {
-        $(`#${className}`).append(`<p style="display: none;" class="text-center my-3">${messasge}</p>`);
-        $(`#${className} .list-group`).css({'display': 'none'});
-        $(`#${className} p`).fadeIn();
+        $(`${className}`).append(`<p style="display: none;" class="text-center my-3">${messasge}</p>`);
+        $(`${className} .list-group`).css({'display': 'none'});
+        $(`${className} p`).fadeIn();
+    }
+
+    function removeNotificationEmpty(className) {
+        if($(`${className} p`).length > 0) {
+            $(`${className} p`).remove();
+            $(`${className} .list-group`).fadeIn();
+        }
     }
 
     $.get('/friend-requests', function(data) {
         if(data.length === 0) {
-            addNotificationEmpty('list-add-friend', 'There are not friend invitations');
+            addNotificationEmpty('#list-add-friend', 'There are not friend invitations');
         }
         for (request of data) {
-            $('#list-add-friend .list-group').append(`
-            <a
-                id="friend-request-${request.friend_id}"
-                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
-                <img src="https://ui-avatars.com/api/?name=${request.username}&size=60" />
-                <b>${request.username}</b>
-                <div class="d-flex">
-                    <button class="btn btn-add-friend" data-accept=1 data-user-id=${request.friend_id}><i class="fas fa-check"></i></button>
-                    <button class="btn btn-add-friend" data-accept=2 data-user-id=${request.friend_id}><i class="fas fa-times"></i></button>
-                </div>
-            </a>
-            `);
+            addFriend(request);
         }
 
-        $('.btn-add-friend').click(function() {
-            var accept = $(this).attr('data-accept');
-            var friend_id = $(this).attr('data-user-id');
-            $.post('/friend-requests', {accept, friend_id}, function(data) {
-                $(`#friend-request-${friend_id}`).slideUp(400, function() {
-                        $(`#friend-request-${friend_id}`).remove();
-                        if($('#list-add-friend .list-group a').length === 0) {
-                            addNotificationEmpty('list-add-friend', 'There are not friend invitations');
-                        }
-                });
+        $('.btn-add-friend').click(addFriendEvent);
+
+    });
+
+    function addFriendEvent() {
+        var accept = $(this).attr('data-accept');
+        var friend_id = $(this).attr('data-user-id');
+        $.post('/friend-requests', {accept, friend_id}, function(data) {
+            $(`#friend-request-${friend_id}`).slideUp(400, function() {
+                    $(`#friend-request-${friend_id}`).remove();
+                    if($('#list-add-friend .list-group a').length === 0) {
+                        addNotificationEmpty('#list-add-friend', 'There are not friend invitations');
+                    }
             });
         });
+    }
 
-    });
-
-    $('#join').submit(function (e) {
-        socket.emit('join', {
-            room: $('#join_room').val()
-        });
-
-        linkRoom($('#join_room').val());
-        containerRoom($('#join_room').val());
-
-        $('.room').click(function (e) {
-            e.preventDefault();
-            room = $(this).attr('data-room');
-            // console.log(room);
-        });
-
-        return false;
-    });
+    function addFriend(request) {
+        $('#list-add-friend .list-group').append(`
+        <a
+            id="friend-request-${request.friend_id}"
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
+            <img src="https://ui-avatars.com/api/?name=${request.username}&size=60" />
+            <b>${request.username}</b>
+            <div class="d-flex">
+                <button class="btn btn-add-friend" data-accept=1 data-user-id=${request.friend_id}><i class="fas fa-check"></i></button>
+                <button class="btn btn-add-friend" data-accept=2 data-user-id=${request.friend_id}><i class="fas fa-times"></i></button>
+            </div>
+        </a>
+        `);
+    }
 
     $('#leave').submit(function (e) {
         socket.emit('leave', {
@@ -289,11 +321,38 @@ $(document).ready(function () {
         return false;
     });
 
-    var down = true;
-
-    $('.btn-add').click(function(e) {
-        $('#chat-left-tab-content .tab-pane .list-group ').animate({height: `${down ? 440 : 500}px`}, 500)
-        $('.add-friend-form').slideToggle(500)
-        down = !down
-    })
+    $('#form-add-friend').submit(function(e) {
+        var text = $('#form-add-friend input[type=text]').val();
+        if(text !== '') {
+            $('.modal .modal-body').append(`
+                <div class="d-flex justify-content-center spinner">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>    
+                </div>
+            `)
+            $.get(`/add-friend/${text}`, function(data) {
+                $('.modal .modal-body .spinner').fadeOut(200, function() {
+                    $('.modal .modal-body .spinner').remove();
+                    if(data.error) {
+                        $('.modal .modal-body').append(`
+                        <div class="alert alert-danger alert-dismissible fade show mt-3" style="display:none" role="alert">
+                            <strong>Error! </strong>${data.error}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        `);
+                        $('.modal .modal-body .alert').fadeIn();
+                        setTimeout(3000, function() {
+                            $('.modal .modal-body .alert').remove();
+                        });
+                    } else {
+                        $('.modal').modal('toggle');
+                    }
+                })
+            });
+        }
+        return false;
+    });
 });

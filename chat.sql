@@ -42,3 +42,8 @@ CREATE TABLE users_channels (
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+CREATE TABLE sessions (
+    user_id BIGINT NOT NULL PRIMARY,
+    session_id VARCHAR(50) NOT NULL
+)

@@ -45,7 +45,11 @@ def getUserIdByUsername(username):
         ("SELECT user_id as id FROM users WHERE username = %(username)s"),
         {'username': username}
     )
-    (id,) = cQuery.fetchone()
+    id_fetch = cQuery.fetchone()
+    id = None
+    if(id_fetch != None):
+        (id,) = id_fetch
+    cnx.close()
     return id
 
 def addFriend(user_id, friend_id, status):

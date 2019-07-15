@@ -1,16 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://unpkg.com/webkul-micron@1.1.6/dist/css/micron.min.css" type="text/css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" />
+    <title>Login</title>
 </head>
+
 <body>
-    <form action="" method="post">
-        Username: <input name="username" />
-        Password: <input name="password" />
-        <button type="submit">Đăng nhập</button>
-    </form>
+    <div class="login-container d-flex justify-content-center align-items-center flex-column">
+        <div class="logo mb-3" data-micron="swing" data-micron-timing="ease-in"><b>Palo</b>Chat</div>
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <b>Who's there?</b>
+            </div>
+            <div class="card-body">
+                <form action="/login" method="post" class="d-flex flex-column align-items-center">
+                    <div class="input-group flex-nowrap mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Username" aria-label="Username"
+                            aria-describedby="addon-wrapping" name="username">
+                    </div>
+                    <div class="input-group flex-nowrap mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping"><i class="fas fa-lock"></i></span>
+                        </div>
+                        <input type="password" class="form-control" placeholder="Password" aria-label="Username"
+                            aria-describedby="addon-wrapping" name="password">
+                    </div>
+
+                    <button type="submit" class="btn btn-login">Let me in</button>
+                </form>
+            </div>
+        </div>
+        <a class="btn-register mt-3 " href="#">Create account</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://unpkg.com/webkul-micron@1.1.6/dist/script/micron.min.js" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
+
 </html>

@@ -26,41 +26,44 @@ def messageReceived(methods=['GET', 'POST']):
     print('message was received!!!')
 
 
-@socketio.on('my event')
-def handle_my_custom_event(message):
-    emit('my_respone', {'data': message['data']})
-
-# @socketio.on('connect')
-# def connectRoom():
-#     if 'user' in session:
-#         channels = Channel.getAllChannel(session['user'])
-#         for channel in channels:
-#             join_room(channel['channel_id'])
-    # print(rooms())
+@socketio.on('connect')
+def connectRoom():
+    if 'user' in session:
+        join_room(str(session['user']['user_id']))
 
 
 @socketio.on('join')
 def join(message):
     join_room(message['room'])
-    emit('my_response', {
-        'data': 'In rooms: ' + ', '.join(rooms())
-    })
+    # emit('my_response', {
+    #     'data': 'In rooms: ' + ', '.join(rooms())
+    # })
 
 
 @socketio.on('leave')
 def leave(message):
     leave_room(message['room'])
-    emit('my_response', {
-        'data': 'In rooms: ' + ', '.join(rooms())
-    })
+    # emit('my_response', {
+    #     'data': 'In rooms: ' + ', '.join(rooms())
+    # })
 
 
 @socketio.on('close_room')
 def close(message):
-    emit('my_response', {
-        'data': 'Room ' + message['room'] + ' is closing',
-    }, room=message['room'])
+    # emit('my_response', {
+    #     'data': 'Room ' + message['room'] + ' is closing',
+    # }, room=message['room'])
     close_room(message['room'])
+
+
+@socketio.on('seen_event')
+def send_event_seen(event):
+    print('PENG')
+    emit('my_response', {
+        'type': 'seen',
+        'room': event['room'],
+        'id': event['id']
+    }, room=event['room'])
 
 
 @socketio.on('my_room_event')
@@ -70,6 +73,7 @@ def send_room_message(message):
                        ['user_id'], message['data'])
 
     emit('my_response', {
+        'type': 'message',
         'data': {
             'content': message['data'],
             'time': datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -156,6 +160,22 @@ def getFriendRequest():
                 Channel.addUserToChannel(channel_id, user_id)
                 Channel.addUserToChannel(channel_id, friend_id)
                 data = User.getInfoUser(user_id)
+
+                emit('my_response', {
+                    'type': 'create-room',
+                    'data': {
+                        'channel_id': 'room-{}'.format(channel_id),
+                        'friend': session['user']['username']
+                    }
+                }, namespace='/', room=str(user_id))
+                emit('my_response', {
+                    'type': 'create-room',
+                    'data': {
+                        'channel_id': 'room-{}'.format(channel_id),
+                        'friend': data['username']
+                    }
+                }, namespace='/', room=str(friend_id))
+
                 return jsonify({
                     'friend_id': data['user_id'],
                     'username': data['username']
@@ -170,6 +190,28 @@ def getFriendRequest():
             'error': 'you must login'
         })
 
+@app.route("/add-friend/<username>")
+def addFriend(username):
+    if 'user' in session:
+        friend_id = User.getUserIdByUsername(username)
+        if friend_id == None:
+            return jsonify({
+                'error': "username doesn't exist"
+            })
+        else:
+            User.addFriend(session['user']['user_id'], friend_id, 0)
+            emit('my_response', {
+                'type': 'friend-request',
+                'friend_id': session['user']['user_id'],
+                'username': session['user']['username'] 
+            }, namespace='/', room=str(friend_id))
+            return jsonify({
+                'success': "send request successfully"
+            })
+    else:
+        return jsonify({
+            'error': 'you must login'
+        })
 
 @app.route("/no-seen/<room>")
 def getSeen(room):
@@ -178,6 +220,19 @@ def getSeen(room):
         return jsonify({
             'count': Message.getCountNotSeen(room, session['user']['user_id']),
             'time': Message.getLastTimeMessage(channel_id)
+        })
+    else:
+        return jsonify({
+            'error': 'you must login'
+        })
+
+
+@app.route("/seen-user/<room>")
+def getUserSeen(room):
+    if 'user' in session:
+        status = len(Message.getAllUserNotSeen(room)) == 0
+        return jsonify({
+            'status': status
         })
     else:
         return jsonify({

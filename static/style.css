@@ -34,6 +34,7 @@
     background-color: transparent;
     display: none;
 }
+
 ::-webkit-scrollbar {
     width: 10px;
     background-color: transparent;
@@ -53,20 +54,6 @@
 
 body {
     font-family: 'Ubuntu', sans-serif;
-}
-
-@keyframes bg {
-    0% {
-        background: #00d2ff;
-    }
-
-    50% {
-        background: #3a7bd5;
-    }
-
-    100% {
-        background: #00d2ff;
-    }
 }
 
 .room {
@@ -109,7 +96,7 @@ body {
 .card-left {
     height: 100%;
     background: #fff;
-    border-left:0;
+    border-left: 0;
 }
 
 .card-left .card-chat-header {
@@ -140,7 +127,7 @@ body {
 .card-right .card-chat-footer {
     background: #FAFAFA;
     padding: 10px;
-    border-top:1px solid #eaeaea;
+    border-top: 1px solid #eaeaea;
 }
 
 .card-right .card-chat-footer input[type=text] {
@@ -162,7 +149,7 @@ body {
     background: transparent;
 }
 
-.btn-send:hover  {
+.btn-send:hover {
     background: #27A360;
 }
 
@@ -237,10 +224,11 @@ body {
     border-bottom: 1px solid #eaeaea;
 }
 
-#chat-left-tab .nav-item .nav-link.active{
+#chat-left-tab .nav-item .nav-link.active {
     color: #3F91CA;
     border-bottom: 2px solid #3F91CA;
 }
+
 #chat-left-tab .nav-item .nav-link {
     color: #B5C1CD;
     /* color: rgba(60, 159, 247, 0.5); */
@@ -266,7 +254,7 @@ body {
     color: rgb(20, 85, 51);
 }
 
-.add-friend-form input[type=text]{
+.add-friend-form input[type=text] {
     width: 100%;
     border: 0;
     border-radius: 3px;
@@ -285,6 +273,95 @@ body {
 
 .btn-header {
     background: transparent;
-    color: #fff;
+    color: #B5C1CD;
     padding: 5px;
 }
+
+.logo {
+    cursor: pointer;
+}
+
+.list-friend-search .list-group-item img {
+    border-radius: 50px;
+    width: 50px;
+    margin-right: 10px;
+}
+
+.btn-outline-chat {
+    border-color: rgb(93, 146, 188);
+    background: transparent;
+    padding: 5px 10px;
+    color: rgb(93, 146, 188);
+}
+
+.btn-outline-chat:hover {
+    background: rgb(93, 146, 188);
+    color: #fff;
+}
+
+.login-container {
+    height: 100vh;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#29a8db+0,23538a+100 */
+    background: #29a8db;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #29a8db 0%, #23538a 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #29a8db 0%, #23538a 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #29a8db 0%, #23538a 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#29a8db', endColorstr='#23538a', GradientType=1);
+    /* IE6-9 */
+}
+
+.login-container .card {
+    border-color: #eaeaea;
+    width: 350px;
+}
+
+.login-container .card-header b {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    border-color: #eaeaea;
+}
+
+.login-container input {
+    border-color: #eaeaea;
+}
+
+.login-container .input-group-text {
+    background: #eaeaea;
+    border-color: #eaeaea;
+    color: #aeaeae;
+}
+
+.login-container .btn-login {
+    background: #29a8db;
+    background: -moz-linear-gradient(left, #29a8db 0%, #35adce 100%);
+    background: -webkit-linear-gradient(left, #29a8db 0%, #35adce 100%);
+    background: linear-gradient(to right, #29a8db 0%, #35adce 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#29a8db', endColorstr='#35adce', GradientType=1);
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    border: 0;
+}
+
+.login-container .btn-register {
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    font-size: 1.1rem;
+}
+
+.login-container .logo {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    cursor: pointer;
+    font-size: 2.2rem;
+}
+

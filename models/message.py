@@ -112,3 +112,24 @@ def getLastTimeMessage(channel_id):
         date = datetime.datetime(2000, 1, 1)
     cnx.close()
     return date
+
+def getAllUserNotSeen(room):
+    channel_id = int(room[5:len(room)])
+    cnx = connect.createConnect();
+    cursor = cnx.cursor()
+    cursor.execute(
+        ('SELECT uc.user_id '
+        'FROM users_channels uc, messages m '
+        'WHERE uc.channel_id = %(channel_id)s '
+        'AND uc.channel_id = m.channel_id '
+        'AND m.updated_at > uc.seen '
+        'GROUP BY uc.user_id'),
+        {
+            'channel_id': channel_id
+        }
+    )
+    users = []
+    for (user_id,) in cursor:
+        users.append(user_id)
+    cnx.close()
+    return users
