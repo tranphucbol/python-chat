@@ -1,10 +1,11 @@
 import datetime
 import connect
+import uuid
 
 
-def addMessage(room, author_id, message):
-    channel_id = int(room[5:len(room)])
+def addMessage(channel_id, author_id, message):
     data = {
+        'message_id': str(uuid.uuid1()),
         'channel_id': channel_id,
         'author_id': author_id,
         'content': message
@@ -15,7 +16,8 @@ def addMessage(room, author_id, message):
     cursorSeen = cnx.cursor()
 
     cursor.execute(
-        ('INSERT INTO messages (channel_id, author_id, content, created_at, updated_at) VALUES (%(channel_id)s, %(author_id)s, %(content)s, now(), now())'),
+        ('INSERT INTO messages (message_id, channel_id, author_id, content, created_at, updated_at) '
+        'VALUES (%(message_id)s, %(channel_id)s, %(author_id)s, %(content)s, now(), now())'),
         data
     )
     cursorSeen.execute(
@@ -30,8 +32,7 @@ def addMessage(room, author_id, message):
     cnx.close()
 
 
-def getAllMessage(room, user_id):
-    channel_id = int(room[5:len(room)])
+def getAllMessage(channel_id, user_id):
     cnx = connect.createConnect()
     cursor = cnx.cursor()
     cursor.execute(
@@ -59,8 +60,7 @@ def getAllMessage(room, user_id):
     return messages
 
 
-def getCountNotSeen(room, user_id):
-    channel_id = int(room[5:len(room)])
+def getCountNotSeen(channel_id, user_id):
     cnx = connect.createConnect()
     cursor = cnx.cursor()
 
@@ -81,8 +81,7 @@ def getCountNotSeen(room, user_id):
     return count
 
 
-def updateSeen(room, user_id):
-    channel_id = int(room[5:len(room)])
+def updateSeen(channel_id, user_id):
     cnx = connect.createConnect()
     cursor = cnx.cursor()
 
@@ -113,8 +112,7 @@ def getLastTimeMessage(channel_id):
     cnx.close()
     return date
 
-def getAllUserNotSeen(room):
-    channel_id = int(room[5:len(room)])
+def getAllUserNotSeen(channel_id):
     cnx = connect.createConnect();
     cursor = cnx.cursor()
     cursor.execute(

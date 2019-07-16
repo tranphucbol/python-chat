@@ -53,6 +53,8 @@ $(document).ready(function () {
                 createRoom(message.data);
                 $('.room').click(roomClickEvent);
             }
+        } else if (message.type === 'online-status') {
+            updateOnlineStatus(message.friend_id, message.online)
         } else {
             // console.log(message.data)
         }
@@ -128,7 +130,10 @@ $(document).ready(function () {
             <a
                 id="friend-request-${friend.friend_id}"
                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
-                <img src="https://ui-avatars.com/api/?name=${friend.username}&size=60" />
+                <div class="user-avatar">
+                    <img src="https://ui-avatars.com/api/?name=${friend.username}&size=60" />
+                    <div class="status ${friend.online ? 'online' : 'offline'}"></div>
+                </div>
                 <b>${friend.username}</b>
             </a>
             `);
@@ -228,13 +233,25 @@ $(document).ready(function () {
         $('.room-chat').append(`
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center room"
                     data-room="${room.channel_id}"
-                    id="list-${room.channel_id}-list" data-toggle="list" href="#list-${room.channel_id}" role="tab" aria-controls="${room.friend}">
-            <img src="https://ui-avatars.com/api/?name=${room.friend}&size=60" />
+                    data-user-id="${room.friend.id}"
+                    id="list-${room.channel_id}-list" data-toggle="list" href="#list-${room.channel_id}" role="tab" aria-controls="${room.friend.name}">
+            <div class="user-avatar">
+                <img src="https://ui-avatars.com/api/?name=${room.friend.name}&size=60" />
+                ${room.friend.online === undefined ? '' : `<div class="status ${room.friend.online ? 'online' : 'offline'}"></div>`}
+            </div>
             <div class="room-content">
-                <b class="m-0">${room.friend}</b>
+                <b class="m-0">${room.friend.name}</b>
                 <small>Hello boy!!!</small>
             </div>
         </a>`)
+    }
+
+    function updateOnlineStatus(friend_id, online) {
+        $(`.room[data-user-id='${friend_id}'] .user-avatar .status`).remove();
+        $(`#friend-request-${friend_id} .user-avatar .status`).remove();
+
+        $(`.room[data-user-id='${friend_id}'] .user-avatar`).append(`<div class="status ${online ? 'online' : 'offline'}"></div>`)
+        $(`#friend-request-${friend_id} .user-avatar`).append(`<div class="status ${online ? 'online' : 'offline'}"></div>`)
     }
 
     function containerRoom(room) {
@@ -288,7 +305,9 @@ $(document).ready(function () {
         <a
             id="friend-request-${request.friend_id}"
             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center add-friend">
-            <img src="https://ui-avatars.com/api/?name=${request.username}&size=60" />
+            <div class="user-avatar">
+                <img src="https://ui-avatars.com/api/?name=${request.username}&size=60" />     
+            </div>
             <b>${request.username}</b>
             <div class="d-flex">
                 <button class="btn btn-add-friend" data-accept=1 data-user-id=${request.friend_id}><i class="fas fa-check"></i></button>
@@ -355,4 +374,5 @@ $(document).ready(function () {
         }
         return false;
     });
+    
 });

@@ -2,14 +2,19 @@ import models.user as User
 import connect
 import datetime
 import models.message as Message
+import models.session as Session
+import uuid
 
 def createChannel():
     cnx = connect.createConnect()
     cursor = cnx.cursor()
+    id = str(uuid.uuid1())
     cursor.execute(
-        ('INSERT INTO channels () values ()')
+        ('INSERT INTO channels (channel_id) values (%(channel_id)s)'),
+        {
+            'channel_id': id
+        }
     )
-    id = cursor.lastrowid
     cnx.commit()
     cnx.close()
     return id
@@ -26,6 +31,27 @@ def addUserToChannel(channel_id, user_id):
     )
     cnx.commit()
     cnx.close()
+
+def getAllChannelTwoUser(user_id):
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+    cursor.execute(
+        'SELECT uc.channel_id '
+        'FROM users_channels uc, users_channels fc '
+        'WHERE uc.user_id = %(user_id)s '
+        'AND uc.channel_id = fc.channel_id '
+        'AND fc.user_id <> %(user_id)s '
+        'GROUP BY uc.channel_id '
+        'HAVING COUNT(uc.user_id)',
+        {
+            'user_id': user_id
+        }
+    )
+    channels = []
+    for (channel_id,) in cursor:
+        channels.append(channel_id)
+    cnx.close()
+    return channels
 
 def getAllChannel(user_id):
     cnx = connect.createConnect()
@@ -44,13 +70,15 @@ def getAllChannel(user_id):
 
     channels = []
     for (channel_id, count,) in cursor:
-        friend = ''
+        friend = {}
         if count == 1:
-            friend = getChannelName(channel_id, user_id)
+            friend['name'] = getChannelName(channel_id, user_id)
+            friend['id'] = User.getUserIdByUsername(friend['name'])
+            friend['online'] = Session.checkUserOnline(friend['id'])
         else:
-            friend = getChannelName(channel_id)
+            friend['name'] = getChannelName(channel_id)
         channels.append({
-            'channel_id': 'room-{}'.format(channel_id),
+            'channel_id': channel_id,
             'friend': friend,
             'last_reaction': Message.getLastTimeMessage(channel_id)
     })
