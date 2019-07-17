@@ -23,12 +23,11 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h3 class="logo button m-0" data-micron="swing" data-micron-timing="ease-in"><b>Palo</b>Chat
                             </h3>
-                            <!-- <a href="#!" >Label</a> -->
                             <div class="d-flex">
                                 <button class="btn btn-header" data-toggle="modal" data-target="#addFriendModal">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button class="btn btn-header"><i class="fas fa-users"></i></button>
+                                <button class="btn btn-header" data-toggle="modal" data-target="#addGroupChatModal"><i class="fas fa-users"></i></button>
                                 <a class="btn btn-header" href="/logout"><i class="fas fa-sign-out-alt"></i></a>
                             </div>
                         </div>
@@ -43,7 +42,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form id="form-add-friend">
+                                        <form id="form-add-friend" class="form-add">
                                             <div class="input-group">
                                                 <input type="text" class="form-control"
                                                     placeholder="Email or username" />
@@ -57,20 +56,73 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="modal fade" id="addGroupChatModal" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-ui">
+                                        <h5 class="modal-title">New Group</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form class="form-add">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control"
+                                                    placeholder="Email or username" />
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-chat" type="submit"><i
+                                                            class="fas fa-plus"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <div class="chip-group p-3">
+                                            <div class="chip">
+                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
+                                                John Doe
+                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                                            </div>
+                                            <div class="chip">
+                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
+                                                John Doe
+                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                                            </div>
+                                            <div class="chip">
+                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
+                                                John Doe
+                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                                            </div>
+                                            <div class="chip">
+                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
+                                                John Doe
+                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                                            </div>
+                                            <div class="chip">
+                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
+                                                John Doe
+                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-chat-body p-0">
                         <ul class="nav d-flex justify-content-between" id="chat-left-tab" role="tablist">
-                            <li class="nav-item">
+                            <li class="nav-item text-center" style="flex: 1;">
                                 <a class="nav-link active" id="list-chat-room-tab" data-toggle="tab"
                                     href="#list-chat-room" role="tab" aria-controls="list-chat-room"
                                     aria-selected="true"><i class="fas fa-comment"></i></a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item text-center" style="flex: 1;">
                                 <a class="nav-link" id="list-add-friend-tab" data-toggle="tab" href="#list-add-friend"
                                     role="tab" aria-controls="list-add-friend" aria-selected="false"><i
                                         class="fas fa-user-plus"></i></a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item text-center" style="flex: 1;">
                                 <a class="nav-link" id="list-contact-tab" data-toggle="tab" href="#list-contact"
                                     role="tab" aria-controls="list-contact" aria-selected="false"><i
                                         class="fas fa-address-book"></i></a>

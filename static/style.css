@@ -269,6 +269,7 @@ body {
     background: transparent;
     color: #B5C1CD;
     padding: 5px;
+    font-size: 1.1rem;
 }
 
 .logo {
@@ -282,14 +283,14 @@ body {
 } */
 
 .btn-outline-chat {
-    border-color: rgb(93, 146, 188);
+    border-color: rgb(77, 164, 218);
     background: transparent;
     padding: 5px 10px;
-    color: rgb(93, 146, 188);
+    color: rgb(77, 164, 218);
 }
 
 .btn-outline-chat:hover {
-    background: rgb(93, 146, 188);
+    background: rgb(77, 164, 218);
     color: #fff;
 }
 
@@ -386,3 +387,35 @@ body {
 .user-avatar .status.online {
     background: rgb(28, 206, 28);
 }
+
+.chip {
+    display: inline-block;
+    padding: 0 25px;
+    height: 50px;
+    font-size: 16px;
+    line-height: 50px;
+    border-radius: 25px;
+    background-color: #f1f1f1;
+    margin: 5px;
+  }
+  
+  .chip img {
+    float: left;
+    margin: 0 10px 0 -25px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+  }
+
+  .closebtn {
+    padding-left: 10px;
+    color: #888;
+    font-weight: bold;
+    float: right;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .closebtn:hover {
+    color: #000;
+  }

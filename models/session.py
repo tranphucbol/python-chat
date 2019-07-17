@@ -63,6 +63,9 @@ def checkSession(session_id):
         }
     )
 
-    user_id = cursor.fetchone()
+    raw = cursor.fetchone()
+    user_id = None
+    if raw != None:
+        (user_id,) = raw
     cnx.close()
     return user_id

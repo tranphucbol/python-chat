@@ -110,8 +110,6 @@ def test_disconnect():
                 'online': False
             }, namespace="/", room=friend['friend_id'])
 
-
-
 @app.route("/messages/<channel_id>")
 def getMessages(channel_id):
     if 'user' in session:
