@@ -38,6 +38,7 @@ $(document).ready(function () {
             }
             $(`#list-${message.room}`).animate({scrollTop: $(`#list-${message.room}`)[0].scrollHeight}, 1000);
             updateLastMessage(message.room);
+            prependLastMessage(message.room);
         } else if (message.type === 'seen') {
             if(ids.indexOf(message.id) === -1) {
                 updateLastMessage(message.room, true);
@@ -196,6 +197,10 @@ $(document).ready(function () {
         $(`#list-${room} .message:last-child .bubble-right .d-flex`).append(`<small class="send-status ml-3">${status ? 'Seen' : 'Sent'}</small>`);
     }
 
+    function prependLastMessage(room) {
+        $(`#list-${room}-list`).prependTo($('.room-chat'));
+    }
+
     function updateHeaderChat(room) {
         var src = $(`#list-${room}-list img`).attr('src');
         var name = $(`#list-${room}-list .room-content b`).text().trim();
@@ -340,6 +345,40 @@ $(document).ready(function () {
         return false;
     });
 
+    function checkUserExist(username) {
+        $.get(`/check-user/${username}`, function(data) {
+            if(data.error === undefined && data.exist) {
+                $('.chip-group').append(`
+                    <div class="chip">
+                        <img src="https://ui-avatars.com/api/?name=${username}&size=60" alt="Person">
+                        <div class="chip-name">${username}</div>
+                        <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+                    </div>
+                `)
+            }
+        });
+    }
+
+    $('#form-new-group').submit(function(e) {
+        var username = $('#form-new-group input[type=text]').val();
+        if(username !== '') {
+            checkUserExist(username);
+            $('#form-new-group input[type=text]').val('');
+        }
+        return false;
+    });
+
+    $('#btn-new-group').click(function(e) {
+        var friends = [];
+        $('.chip-group .chip .chip-name').each(function() {
+            friends.push($(this).text());
+        });
+        $.post('/channels', {friends}, function(data) {
+            createRoom(data);
+            $('.room').click(roomClickEvent);
+        });
+    })
+
     $('#form-add-friend').submit(function(e) {
         var text = $('#form-add-friend input[type=text]').val();
         if(text !== '') {
@@ -367,7 +406,7 @@ $(document).ready(function () {
                             $('.modal .modal-body .alert').remove();
                         });
                     } else {
-                        $('.modal').modal('toggle');
+                        $('#addFriendModal').modal('toggle');
                     }
                 })
             });

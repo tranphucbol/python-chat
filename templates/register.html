@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" />
-    <title>Login</title>
+    <title>Register</title>
 </head>
 
 <body>
@@ -20,10 +20,10 @@
         <div class="logo mb-3" data-micron="swing" data-micron-timing="ease-in"><b>Palo</b>Chat</div>
         <div class="card shadow-sm">
             <div class="card-header">
-                <b>Who's there?</b>
+                <b>Hi, Friend</b>
             </div>
             <div class="card-body">
-                <form action="/login" method="post" class="d-flex flex-column align-items-center">
+                <form action="/register" method="post" class="d-flex flex-column align-items-center">
                     <div class="input-group flex-nowrap mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="addon-wrapping"><i class="fas fa-user"></i></span>
@@ -38,12 +38,19 @@
                         <input type="password" class="form-control" placeholder="Password" aria-label="Username"
                             aria-describedby="addon-wrapping" name="password">
                     </div>
+                    <div class="input-group flex-nowrap mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping"><i class="fas fa-lock"></i></span>
+                        </div>
+                        <input type="password" class="form-control" placeholder="Re-Password" aria-label="Username"
+                            aria-describedby="addon-wrapping" name="re-password">
+                    </div>
 
-                    <button type="submit" class="btn btn-login">Let me in</button>
+                    <button type="submit" class="btn btn-login">Let's join</button>
                 </form>
             </div>
         </div>
-        <a class="btn-register mt-3 " href="/register">Create account</a>
+        <a class="btn-register mt-3 " href="/login">Login</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>

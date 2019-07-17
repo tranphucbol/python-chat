@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div class="modal fade" id="addGroupChatModal" tabindex="-1" role="dialog"
-                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            aria-labelledby="exampleModalCenterTitlebeng" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header bg-ui">
@@ -67,7 +67,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form class="form-add">
+                                        <form class="form-add mb-3" id="form-new-group">
                                             <div class="input-group">
                                                 <input type="text" class="form-control"
                                                     placeholder="Email or username" />
@@ -77,34 +77,11 @@
                                                 </div>
                                             </div>
                                         </form>
-                                        <div class="chip-group p-3">
-                                            <div class="chip">
-                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
-                                                John Doe
-                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
-                                            </div>
-                                            <div class="chip">
-                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
-                                                John Doe
-                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
-                                            </div>
-                                            <div class="chip">
-                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
-                                                John Doe
-                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
-                                            </div>
-                                            <div class="chip">
-                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
-                                                John Doe
-                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
-                                            </div>
-                                            <div class="chip">
-                                                <img src="https://ui-avatars.com/api/?name=tranphucbol&size=60" alt="Person" width="96" height="96">
-                                                John Doe
-                                                <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
-                                            </div>
-                                        </div>
-                                        
+                                        <div class="chip-group"></div>
+                                    </div>
+                                    <div class="modal-footer p-2">
+                                        <button class="btn btn-transparent" data-dismiss="modal"><b>CANCEL</b></button>
+                                        <button class="btn btn-transparent" id="btn-new-group"><b>NEW</b></button>
                                     </div>
                                 </div>
                             </div>

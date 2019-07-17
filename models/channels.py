@@ -76,6 +76,7 @@ def getAllChannel(user_id):
             friend['id'] = User.getUserIdByUsername(friend['name'])
             friend['online'] = Session.checkUserOnline(friend['id'])
         else:
+            print('peng')
             friend['name'] = getChannelName(channel_id)
         channels.append({
             'channel_id': channel_id,

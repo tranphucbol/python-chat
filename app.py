@@ -110,10 +110,12 @@ def test_disconnect():
                 'online': False
             }, namespace="/", room=friend['friend_id'])
 
+
 @app.route("/messages/<channel_id>")
 def getMessages(channel_id):
     if 'user' in session:
-        messages = Message.getAllMessage(channel_id, session['user']['user_id'])
+        messages = Message.getAllMessage(
+            channel_id, session['user']['user_id'])
         return jsonify(messages)
     else:
         return jsonify({
@@ -136,17 +138,62 @@ def login():
 
     return render_template('login.html')
 
+@app.route("/register", methods=['GET', 'POST'])
+def register    ():
+    if request.method == 'POST':
+        if User.checkUserExist(request.form['username']) == False and request.form['password'] == request.form['re-password']:
+            print(request.form)
+            User.addUser(request.form['username'], request.form['password'])
+            session['user'] = {
+                'username': request.form['username'],
+                'user_id': User.getUserIdByUsername(request.form['username'])
+            }
+            return redirect('/')
+
+    if 'user' in session:
+        return redirect('/')
+
+    return render_template('register.html')
+
 
 @app.route("/channels", methods=['GET', 'POST'])
 def getChannels():
-    if request.method == 'GET':
-        if 'user' in session:
+    if 'user' in session:
+        if request.method == 'GET':
             channels = Channel.getAllChannel(session['user']['user_id'])
             return jsonify(channels)
         else:
+            friends = request.form.getlist('friends[]')
+            channel_id = Channel.createChannel()
+            Channel.addUserToChannel(channel_id, session['user']['user_id'])
+            for friend in friends:
+                if friend != session['user']['username'] and User.checkUserExist(friend):
+                    friend_id = User.getUserIdByUsername(friend)
+                    Channel.addUserToChannel(channel_id, friend_id)
+
+            for friend in friends:
+                if friend != session['user']['username'] and User.checkUserExist(friend):
+                    friend_id = User.getUserIdByUsername(friend)
+                    emit('my_response', {
+                        'type': 'create-room',
+                        'data': {
+                            'channel_id': channel_id,
+                            'friend': {
+                                'name': Channel.getChannelName(channel_id)
+                            }
+                        }
+                    }, namespace="/", room=friend_id)
             return jsonify({
-                'error': 'you must login'
+                'channel_id': channel_id,
+                'friend': {
+                    'name': Channel.getChannelName(channel_id)
+                }
             })
+
+    else:
+        return jsonify({
+            'error': 'you must login'
+        })
 
 
 @app.route("/friends")
@@ -181,22 +228,28 @@ def getFriendRequest():
                 channel_id = Channel.createChannel()
                 Channel.addUserToChannel(channel_id, user_id)
                 Channel.addUserToChannel(channel_id, friend_id)
-                data = User.getInfoUser(user_id)
+                data = User.getInfoUser(friend_id)
 
                 emit('my_response', {
                     'type': 'create-room',
                     'data': {
                         'channel_id': channel_id,
-                        'friend': session['user']['username']
+                        'friend': {
+                            'name': session['user']['username'],
+                            'online': True
+                        }
                     }
-                }, namespace='/', room=str(user_id))
+                }, namespace='/', room=str(friend_id))
                 emit('my_response', {
                     'type': 'create-room',
                     'data': {
                         'channel_id': channel_id,
-                        'friend': data['username']
+                        'friend': {
+                            'name': data['username'],
+                            'online': Session.checkUserOnline(friend_id)
+                        }
                     }
-                }, namespace='/', room=str(friend_id))
+                }, namespace='/', room=str(user_id))
 
                 return jsonify({
                     'friend_id': data['user_id'],
@@ -212,6 +265,7 @@ def getFriendRequest():
             'error': 'you must login'
         })
 
+
 @app.route("/add-friend/<username>")
 def addFriend(username):
     if 'user' in session:
@@ -225,7 +279,7 @@ def addFriend(username):
             emit('my_response', {
                 'type': 'friend-request',
                 'friend_id': session['user']['user_id'],
-                'username': session['user']['username'] 
+                'username': session['user']['username']
             }, namespace='/', room=str(friend_id))
             return jsonify({
                 'success': "send request successfully"
@@ -234,6 +288,7 @@ def addFriend(username):
         return jsonify({
             'error': 'you must login'
         })
+
 
 @app.route("/no-seen/<channel_id>")
 def getSeen(channel_id):
@@ -266,17 +321,32 @@ def updateSeen(channel_id):
         if 'user' in session:
             Message.updateSeen(channel_id, session['user']['user_id'])
             return jsonify({
-                'sucess': 'done'
+                'success': 'done'
             })
         else:
             return jsonify({
                 'error': 'you must login'
             })
 
+
+@app.route("/check-user/<username>")
+def checkUser(username):
+    print(username)
+    if 'user' in session:
+        return jsonify({
+            'exist': User.checkUserExist(username)
+        })
+    else:
+        return jsonify({
+            'error': 'you must login'
+        })
+
+
 @app.route('/logout')
 def sign_out():
     session.pop('user')
     return redirect("/login")
+
 
 @app.route("/")
 def home():

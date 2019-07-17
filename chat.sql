@@ -2,11 +2,10 @@ CREATE TABLE users (
     user_id CHAR(36) NOT NULL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password VARCHAR(100) NOT NULL,
-    email VARCHAR(50) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     status SMALLINT(1) NOT NULL,
-    UNIQUE (username, email)
+    UNIQUE (username)
 );
 
 CREATE TABLE friends (

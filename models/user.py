@@ -4,11 +4,10 @@ import connect
 import uuid
 import models.session as Session
 
-def addUser(username, email, password):
+def addUser(username, password):
     data_user = {
         'user_id': str(uuid.uuid1()),
         'username': username,
-        'email': email,
         'password': bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
         'status': 1,
         'createdAt': datetime.datetime.now().astimezone(),
@@ -18,7 +17,7 @@ def addUser(username, email, password):
     cnx = connect.createConnect()
     cursor = cnx.cursor()
     cursor.execute(
-        ("INSERT INTO users (user_id, username, email, password, status, created_at, updated_at) VALUES (%(user_id)s, %(username)s, %(email)s, %(password)s, %(status)s, %(createdAt)s, %(updatedAt)s)"),
+        ("INSERT INTO users (user_id, username, password, status, created_at, updated_at) VALUES (%(user_id)s, %(username)s, %(password)s, %(status)s, %(createdAt)s, %(updatedAt)s)"),
         data_user
     )
     cnx.commit()
@@ -38,6 +37,17 @@ def checkUser(username, password):
             return True
     cnx.close()
     return False
+
+def checkUserExist(username):
+    cnx = connect.createConnect()
+    cursor = cnx.cursor()
+    cursor.execute(
+        ("SELECT user_id FROM users WHERE username = %(username)s"),
+        {'username': username}
+    )
+    user = cursor.fetchone()
+    cnx.close()
+    return user != None
 
 def getUserIdByUsername(username):
     cnx = connect.createConnect()

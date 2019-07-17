@@ -9,9 +9,9 @@ import json
 import uuid
 
 if __name__ == '__main__':
-    User.addUser('tranphucbol', 'tranphucbol@gmail.com', '123456')
+    User.addUser('tranphucbol', '123456')
     for x in range(0, 15):
-        User.addUser('tranphucbol{}'.format(x), 'tranphucbol{}@gmail.com'.format(x), '123456')
+        User.addUser('tranphucbol{}'.format(x), '123456')
     for x in range(0, 10):
         user_id = User.getUserIdByUsername('tranphucbol')
         friend_id = User.getUserIdByUsername('tranphucbol{}'.format(x))
@@ -21,9 +21,9 @@ if __name__ == '__main__':
         Channel.addUserToChannel(id, user_id)
         Channel.addUserToChannel(id, friend_id)
 
-#     channels = Channel.getAllChannel(User.getUserIdByUsername('tranphucbol0'))
+    # channels = Channel.getAllChannel(User.getUserIdByUsername('tranphucbol0'))
     # for channel in channels:
-    #     print(channel['friend'])
+    #     print(channel)
     # messages = Message.getAllMessage('room-1', 1);
     # for message in messages:
     #     print(message)
