@@ -148,14 +148,14 @@ def register    ():
     if request.method == 'POST':
         if User.checkUserExist(request.form['username']) == False :
             if request.form['password'] == request.form['re-password']:
-                return redirect('/register?message=Password does not match re-password')
-            else:
                 User.addUser(request.form['username'], request.form['password'])
                 session['user'] = {
                     'username': request.form['username'],
                     'user_id': User.getUserIdByUsername(request.form['username'])
                 }
                 return redirect('/')
+            else:
+                return redirect('/register?message=Password does not match re-password')
         else:
             return redirect('/register?message=Username existed')
 
