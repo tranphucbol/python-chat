@@ -432,3 +432,7 @@ body {
     background: transparent;
     color: #B5C1CD;
 }
+
+.toast {
+    width: 300px;
+}

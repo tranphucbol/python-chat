@@ -7,19 +7,20 @@ import random
 import datetime
 import json
 import uuid
+import modelRedis.user as UserRedis
 
 if __name__ == '__main__':
-    User.addUser('tranphucbol', '123456')
-    for x in range(0, 15):
-        User.addUser('tranphucbol{}'.format(x), '123456')
-    for x in range(0, 10):
-        user_id = User.getUserIdByUsername('tranphucbol')
-        friend_id = User.getUserIdByUsername('tranphucbol{}'.format(x))
-        User.addFriend(user_id, friend_id, 1)
-        User.addFriend(friend_id, user_id, 1)
-        id = Channel.createChannel()
-        Channel.addUserToChannel(id, user_id)
-        Channel.addUserToChannel(id, friend_id)
+    # User.addUser('tranphucbol', '123456')
+    # for x in range(0, 15):
+    #     User.addUser('tranphucbol{}'.format(x), '123456')
+    # for x in range(0, 10):
+    #     user_id = User.getUserIdByUsername('tranphucbol')
+    #     friend_id = User.getUserIdByUsername('tranphucbol{}'.format(x))
+    #     User.addFriend(user_id, friend_id, 1)
+    #     User.addFriend(friend_id, user_id, 1)
+    #     id = Channel.createChannel()
+    #     Channel.addUserToChannel(id, user_id)
+    #     Channel.addUserToChannel(id, friend_id)
 
     # channels = Channel.getAllChannel(User.getUserIdByUsername('tranphucbol0'))
     # for channel in channels:
@@ -29,3 +30,6 @@ if __name__ == '__main__':
     #     print(message)
     # print(User.getUserIdByUsername('tranphucbol'));
     # Session.addSession('e0d0d99c-a79f-11e9-9352-7446a0975f65', '6d4f6a7f451f48bf91f5c3881e182c3f')
+
+    # UserRedis.addUser('tranphucbol', '1233456')
+    print(UserRedis.getUserIdByUsername('tranphucbol'))

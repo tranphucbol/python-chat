@@ -132,6 +132,8 @@ def login():
                 'user_id': User.getUserIdByUsername(request.form['username'])
             }
             return redirect('/')
+        else:
+            return redirect('/login?message=Wrong username or password')
 
     if 'user' in session:
         return redirect('/')
@@ -141,14 +143,18 @@ def login():
 @app.route("/register", methods=['GET', 'POST'])
 def register    ():
     if request.method == 'POST':
-        if User.checkUserExist(request.form['username']) == False and request.form['password'] == request.form['re-password']:
-            print(request.form)
-            User.addUser(request.form['username'], request.form['password'])
-            session['user'] = {
-                'username': request.form['username'],
-                'user_id': User.getUserIdByUsername(request.form['username'])
-            }
-            return redirect('/')
+        if User.checkUserExist(request.form['username']) == False :
+            if request.form['password'] == request.form['re-password']:
+                return redirect('/register?message=Password does not match re-password')
+            else:
+                User.addUser(request.form['username'], request.form['password'])
+                session['user'] = {
+                    'username': request.form['username'],
+                    'user_id': User.getUserIdByUsername(request.form['username'])
+                }
+                return redirect('/')
+        else:
+            return redirect('/register?message=Username existed')
 
     if 'user' in session:
         return redirect('/')
