@@ -1,13 +1,13 @@
 # import models.user as User
-import models.user as User
-import models.channels as Channel
-import models.message as Message
-import models.session as Session
+# import models.user as User
+# import models.channels as Channel
+# import models.message as Message
+# import models.session as Session
 import random
 import datetime
 import json
 import uuid
-import modelRedis.user as UserRedis
+from models.mysql.user import User
 
 if __name__ == '__main__':
     # User.addUser('tranphucbol', '123456')
@@ -32,4 +32,5 @@ if __name__ == '__main__':
     # Session.addSession('e0d0d99c-a79f-11e9-9352-7446a0975f65', '6d4f6a7f451f48bf91f5c3881e182c3f')
 
     # UserRedis.addUser('tranphucbol', '1233456')
-    print(UserRedis.getUserIdByUsername('tranphucbol'))
+    # user = User()
+    print(User().getUserIdByUsername('tranphucbol'))

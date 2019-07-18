@@ -13,11 +13,15 @@ import datetime
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 
-import models.user as User
-import models.channels as Channel
-import models.message as Message
-import models.session as Session
+from models.mysql.user import User as UserMySql
+from models.mysql.channel import Channel as ChannelMySql
+from models.mysql.message import Message as MessageMySql
+from models.mysql.session import Session as SessionMySql
 
+User = UserMySql()
+Channel = ChannelMySql()
+Message = MessageMySql()
+Session = SessionMySql()
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -84,7 +88,6 @@ def send_room_message(message):
 
     Message.addMessage(message['room'], session['user']
                        ['user_id'], message['data'])
-
     emit('my_response', {
         'type': 'message',
         'data': {

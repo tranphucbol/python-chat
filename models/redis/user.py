@@ -1,5 +1,6 @@
 import connectRedis as connect
 import uuid
+import bcrypt
 
 def addUser(username, password):
     r = connect.createConnect()

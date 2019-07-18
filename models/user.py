@@ -1,147 +1,39 @@
-import datetime
-import bcrypt
-import connect
-import uuid
-import models.session as Session
+import abc
 
-def addUser(username, password):
-    data_user = {
-        'user_id': str(uuid.uuid1()),
-        'username': username,
-        'password': bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
-        'status': 1,
-        'createdAt': datetime.datetime.now().astimezone(),
-        'updatedAt' : datetime.datetime.now().astimezone()
-    }
+class User(metaclass=abc.ABCMeta):
 
-    cnx = connect.createConnect()
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("INSERT INTO users (user_id, username, password, status, created_at, updated_at) VALUES (%(user_id)s, %(username)s, %(password)s, %(status)s, %(createdAt)s, %(updatedAt)s)"),
-        data_user
-    )
-    cnx.commit()
-    cursor.close()
-    cnx.close()
+    @abc.abstractmethod
+    def addUser(username, password):
+        pass
 
-def checkUser(username, password):
-    cnx = connect.createConnect()
-    cQuery = cnx.cursor()
-    cQuery.execute(
-        ("SELECT username as uname, password as pw FROM users WHERE username = %(username)s"),
-        {'username': username}
-    )
-    for(uname, pw) in cQuery:
-        if(bcrypt.checkpw(password.encode('utf-8'), pw.encode('utf-8'))):
-            cnx.close()
-            return True
-    cnx.close()
-    return False
+    @abc.abstractmethod
+    def checkUser(username, password):
+        pass
+    
+    @abc.abstractmethod
+    def checkUserExist(username):
+        pass
 
-def checkUserExist(username):
-    cnx = connect.createConnect()
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("SELECT user_id FROM users WHERE username = %(username)s"),
-        {'username': username}
-    )
-    user = cursor.fetchone()
-    cnx.close()
-    return user != None
+    @abc.abstractmethod
+    def getUserIdByUsername(username):
+        pass
+    
+    @abc.abstractmethod
+    def addFriend(user_id, friend_id, status):
+        pass
 
-def getUserIdByUsername(username):
-    cnx = connect.createConnect()
-    cQuery = cnx.cursor()
-    cQuery.execute(
-        ("SELECT user_id as id FROM users WHERE username = %(username)s"),
-        {'username': username}
-    )
-    id_fetch = cQuery.fetchone()
-    id = None
-    if(id_fetch != None):
-        (id,) = id_fetch
-    cnx.close()
-    return id
+    @abc.abstractmethod
+    def getFriendAllByStatus(user_id, status):
+        pass
 
-def addFriend(user_id, friend_id, status):
-    cnx = connect.createConnect()
-    data = {
-        'user_id': user_id,
-        'friend_id': friend_id,
-        'status': status
-    }
+    @abc.abstractmethod
+    def updateStatusFriend(user_id, friend_id, status):
+        pass
 
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("INSERT INTO friends (user_id, friend_id, status) VALUES (%(user_id)s, %(friend_id)s, %(status)s)"),
-        data
-    )
-    cnx.commit()
-    cnx.close()
+    @abc.abstractmethod
+    def removeFriend(user_id, friend_id):
+        pass
 
-def getFriendAllByStatus(user_id, status):
-    cnx = connect.createConnect()
-    cursor = cnx.cursor()
-    cursor.execute(
-        ('SELECT u.user_id as friend_id, u.username as username FROM users u, friends f WHERE f.friend_id = %(user_id)s AND f.status = %(status)s AND f.user_id = u.user_id'),
-        {
-            'user_id': user_id,
-            'status': status
-        }
-    )
-    friends = []
-    for (friend_id, username,) in cursor:
-        friends.append({
-            'friend_id': friend_id,
-            'username': username,
-            'online': Session.checkUserOnline(friend_id)
-        })
-    cnx.close()
-    return friends
-
-def updateStatusFriend(user_id, friend_id, status):
-    cnx = connect.createConnect()
-    data = {
-        'user_id': user_id,
-        'friend_id': friend_id,
-        'status': status
-    }
-
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("UPDATE friends SET status = %(status)s WHERE user_id = %(user_id)s AND friend_id = %(friend_id)s"),
-        data
-    )
-    cnx.commit()
-    cnx.close()
-
-def removeFriend(user_id, friend_id):
-    cnx = connect.createConnect()
-    data = {
-        'user_id': user_id,
-        'friend_id': friend_id
-    }
-
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("DELETE FROM friends WHERE user_id = %(user_id)s AND friend_id = %(friend_id)s"),
-        data
-    )
-    cnx.commit()
-    cnx.close()
-
-def getInfoUser(user_id):
-    cnx = connect.createConnect()
-    cursor = cnx.cursor()
-    cursor.execute(
-        ("SELECT user_id, username FROM users WHERE user_id = %(user_id)s"),
-        {
-            'user_id': user_id
-        }
-    )
-    (user_id, username) = cursor.fetchone()
-    cnx.close()
-    return {
-        'user_id': user_id,
-        'username': username
-    }
+    @abc.abstractmethod
+    def getInfoUser(user_id):
+        pass
