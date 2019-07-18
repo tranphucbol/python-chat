@@ -7,7 +7,7 @@ import random
 import datetime
 import json
 import uuid
-from models.mysql.user import User
+from models.redis.user import User
 
 if __name__ == '__main__':
     # User.addUser('tranphucbol', '123456')
@@ -22,15 +22,12 @@ if __name__ == '__main__':
     #     Channel.addUserToChannel(id, user_id)
     #     Channel.addUserToChannel(id, friend_id)
 
-    # channels = Channel.getAllChannel(User.getUserIdByUsername('tranphucbol0'))
-    # for channel in channels:
-    #     print(channel)
-    # messages = Message.getAllMessage('room-1', 1);
-    # for message in messages:
-    #     print(message)
-    # print(User.getUserIdByUsername('tranphucbol'));
-    # Session.addSession('e0d0d99c-a79f-11e9-9352-7446a0975f65', '6d4f6a7f451f48bf91f5c3881e182c3f')
+    user = User()
 
-    # UserRedis.addUser('tranphucbol', '1233456')
-    # user = User()
-    print(User().getUserIdByUsername('tranphucbol'))
+    user.addUser('tranphucbol', '123456')
+    user.addUser('tranphucbol1', '123456')
+    user.addUser('tranphucbol2', '123456')
+    user.addFriend(user.getUserIdByUsername('tranphucbol'), user.getUserIdByUsername('tranphucbol1'), 1)
+    user.addFriend(user.getUserIdByUsername('tranphucbol'), user.getUserIdByUsername('tranphucbol2'), 1)
+    print(user.getFriendAllByStatus(user.getUserIdByUsername('tranphucbol'), 1))
+
