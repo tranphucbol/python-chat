@@ -80,7 +80,7 @@ class Channel(ChannelInterface):
                 friend['online'] = Session().checkUserOnline(friend['id'])
             else:
                 print('peng')
-                friend['name'] = getChannelName(channel_id)
+                friend['name'] = self.getChannelName(channel_id)
             channels.append({
                 'channel_id': channel_id,
                 'friend': friend,
