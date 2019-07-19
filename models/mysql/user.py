@@ -76,7 +76,8 @@ class User(UserInterface):
 
         cursor = cnx.cursor()
         cursor.execute(
-            ("INSERT INTO friends (user_id, friend_id, status) VALUES (%(user_id)s, %(friend_id)s, %(status)s)"),
+            ('INSERT INTO friends (user_id, friend_id, status) '
+            'VALUES (%(user_id)s, %(friend_id)s, %(status)s)'),
             data
         )
         cnx.commit()
@@ -86,7 +87,11 @@ class User(UserInterface):
         cnx = connect.createConnect()
         cursor = cnx.cursor()
         cursor.execute(
-            ('SELECT u.user_id as friend_id, u.username as username FROM users u, friends f WHERE f.friend_id = %(user_id)s AND f.status = %(status)s AND f.user_id = u.user_id'),
+            ('SELECT u.user_id as friend_id, u.username as username '
+            'FROM users u, friends f '
+            'WHERE f.friend_id = %(user_id)s '
+            'AND f.status = %(status)s '
+            'AND f.user_id = u.user_id'),
             {
                 'user_id': user_id,
                 'status': status

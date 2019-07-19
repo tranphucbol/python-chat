@@ -185,6 +185,7 @@ $(document).ready(function () {
 
         $.get(`/messages/${room.channel_id}`, function(messages) {
             for (message of messages) {
+                console.log(message.data.time)
                 messageHTML = ''
                 if(message.author_id !== -1) {
                     messageHTML = bubbleLeft(message.data);

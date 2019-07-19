@@ -13,15 +13,19 @@ import datetime
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 
-from models.mysql.user import User as UserMySql
-from models.mysql.channel import Channel as ChannelMySql
-from models.mysql.message import Message as MessageMySql
-from models.mysql.session import Session as SessionMySql
+# from models.redis.user import User as UserMySql
+# from models.redis.channel import Channel as ChannelMySql
+# from models.redis.message import Message as MessageMySql
+# from models.redis.session import Session as SessionMySql
 
-User = UserMySql()
-Channel = ChannelMySql()
-Message = MessageMySql()
-Session = SessionMySql()
+from models.model import Model
+
+model = Model('redis')
+
+User = model.User
+Channel = model.Channel
+Message = model.Message
+Session = model.Session
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -85,7 +89,7 @@ def send_event_seen(event):
 
 @socketio.on('my_room_event')
 def send_room_message(message):
-
+    
     Message.addMessage(message['room'], session['user']
                        ['user_id'], message['data'])
     emit('my_response', {
