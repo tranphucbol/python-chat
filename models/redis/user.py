@@ -4,6 +4,7 @@ import bcrypt
 import datetime
 from models.user import User as UserInterface
 
+
 class User(UserInterface):
     def addUser(self, username, password):
         r = connect.createConnect()
@@ -30,27 +31,43 @@ class User(UserInterface):
     def checkUserExist(self, username):
         r = connect.createConnect()
         return True if r.exists('users:{}'.format(username)) == 1 else False
-    
+
     def addFriend(self, user_id, friend_id, status):
         r = connect.createConnect()
-        r.hmset('friend:{}:{}'.format(user_id, friend_id), {'status': 1})
+        r.hmset('friends:{}:{}'.format(user_id, friend_id), {
+            'friend_id': friend_id,
+            'status': status
+        })
 
     def getFriendAllByStatus(self, user_id, status):
         r = connect.createConnect()
-        keys = r.keys('friend:{}:*'.format(user_id))
+        keys = r.keys('friends:{}:*'.format(user_id))
         friends = []
         for key in keys:
-            friends.append({
-                'status': r.hget(key, 'status').decode('utf-8')
-            })
+            s = int(r.hget(key, 'status').decode('utf-8'))
+            friend_id = r.hget(key, 'friend_id').decode('utf-8')
+            username = r.hget('user_infos:{}'.format(friend_id), 'username')
+            if s == status:
+                friends.append({
+                    'friend_id': friend_id,
+                    'username': username
+                })
 
         return friends
 
     def updateStatusFriend(self, user_id, friend_id, status):
-        pass
+        r = connect.createConnect()
+        r.hmset('friends:{}:{}'.format(user_id, friend_id), {
+            'friend_id': friend_id,
+            'status': status
+        })
 
     def removeFriend(self, user_id, friend_id):
         pass
 
     def getInfoUser(self, user_id):
-        pass
+        r = connect.createConnect()
+        return {
+            'username': r.hmget('user_infos:{}'.format(user_id), 'username').decode('utf-8'),
+            'user_id': user_id
+        }
