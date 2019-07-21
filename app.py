@@ -13,14 +13,9 @@ import datetime
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 
-# from models.redis.user import User as UserMySql
-# from models.redis.channel import Channel as ChannelMySql
-# from models.redis.message import Message as MessageMySql
-# from models.redis.session import Session as SessionMySql
-
 from models.model import Model
 
-model = Model('redis')
+model = Model('mysql')
 
 User = model.User
 Channel = model.Channel
@@ -65,16 +60,9 @@ def join(message):
 @socketio.on('leave')
 def leave(message):
     leave_room(message['room'])
-    # emit('my_response', {
-    #     'data': 'In rooms: ' + ', '.join(rooms())
-    # })
-
 
 @socketio.on('close_room')
 def close(message):
-    # emit('my_response', {
-    #     'data': 'Room ' + message['room'] + ' is closing',
-    # }, room=message['room'])
     close_room(message['room'])
 
 
