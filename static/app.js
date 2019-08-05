@@ -6,8 +6,6 @@ $(document).ready(function () {
         if(params.get('message') !== null) {
             $('body').prepend(`
                 <div class="p-3" style="position: absolute; top: 0; right: 0; z-index: 1000">
-
-                <!-- Then put toasts within -->
                     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
                         <div class="toast-header">
                             <i class="fas fa-exclamation-circle text-danger"></i>

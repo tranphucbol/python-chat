@@ -52,9 +52,6 @@ def connectRoom():
 @socketio.on('join')
 def join(message):
     join_room(message['room'])
-    # emit('my_response', {
-    #     'data': 'In rooms: ' + ', '.join(rooms())
-    # })
 
 
 @socketio.on('leave')
